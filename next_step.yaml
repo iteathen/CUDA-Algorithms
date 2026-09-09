@@ -1,65 +1,75 @@
 {
   "schema_version": 2,
   "updated": "2026-09-09",
-  "status": "architecture_owner_integrated_main_protected_repository_controls_partial",
-  "objective": "Own reusable provider-neutral GPU parallel algorithms without absorbing CUDA-JS mechanisms, Tensor/dataframe/graph/search/domain semantics, or reusable physical memory-management policy.",
+  "status": "first_algorithm_profile_working_design",
+  "objective": "Build reusable provider-neutral GPU parallel algorithms and GPU-owned workset/closure execution without absorbing CUDA-JS mechanisms or consumer/domain semantics.",
   "authority": [
     "AGENTS.md",
+    "AGENT_LOCAL.md",
     "docs/PROJECT_CHARTER.md",
     "docs/specs/SPEC-0001-native-boundary-and-js-only-implementation.md",
     "docs/decisions/ADR-0001-independent-gpu-parallel-algorithm-owner.md"
   ],
-  "completed": {
-    "ownership_bootstrap_issue": 1,
-    "bootstrap_pr": 4,
-    "bootstrap_main_commit": "0ccb34cb88b1cc5a127d1828f0072ca30133cc45",
-    "main_protection": "active_default_branch_integrity_and_pr_review_rulesets"
+  "working_design": {
+    "issue": 3,
+    "branch": "design/first-algorithm-profile",
+    "design_note": "docs/design/2026-09-09-first-profile-design.md",
+    "working_specs": [
+      "docs/specs/SPEC-0002-algorithm-plans-active-extents-and-device-chaining.md",
+      "docs/specs/SPEC-0003-core-sequence-and-keyed-primitives.md",
+      "docs/specs/SPEC-0004-device-worksets-and-fixed-point-closure.md"
+    ],
+    "maturity_rule": "Working Draft specs are intentionally mutable and are not compatibility authority. Revise them as reference/GPU implementation evidence changes the design; promote only stable subsets to Candidate and then Accepted."
   },
+  "selected_decomposition": [
+    "common algorithm plans, bounded active extents and device chaining",
+    "sequence/keyed primitives",
+    "device-owned ranked closure first, general monotone workset closure later if justified"
+  ],
+  "candidate_primitive_spine": [
+    "scan",
+    "reduce",
+    "stable select-indices by flag",
+    "gather by index",
+    "stable radix sort keys and key-index pairs",
+    "run-length encode",
+    "reduce-by-key"
+  ],
+  "key_design_rules": [
+    "use public CUDA-JS device views rather than inventing tensor or record semantics",
+    "prefer index indirection before a generic record ABI",
+    "stable ordering is semantic because repeated stable word passes must support wider consumer-owned keys",
+    "hash equality never substitutes for exact record equality",
+    "allow device-resident active counts bounded by explicit capacity so GPU stages can chain without host count readback",
+    "for GPU-owned profiles Node administers but does not perform mathematical progression or block the event loop",
+    "route only demonstrated missing generic GPU mechanisms downward to CUDA-JS"
+  ],
+  "current_consumers": [
+    "Connect4 BSFP/NDC ranked closure and canonicalization",
+    "CUDA-DATA filter/order/keyed aggregation",
+    "CUDA-GRAPH-ANALYTICS frontier/workset/fixed-point families"
+  ],
+  "next_actions": [
+    "implement deterministic JavaScript reference semantics for the first primitive subset",
+    "add edge/property fixtures for stability, widths, capacity, active extents and wide-key stable-pass composition",
+    "build the smallest exact GPU vertical slice through public CUDA-JS",
+    "derive and record the minimum concrete CUDA-JS parallel-helper gap from implementation evidence",
+    "revise Working Draft specs immediately when implementation disproves or improves the current shape"
+  ],
   "repository_governance": {
     "issue": 2,
-    "status": "protected_main_active_settings_parity_pending",
-    "verified_protection": [
-      "default-branch deletion blocked",
-      "default-branch non-fast-forward updates blocked",
-      "one approving PR review required",
-      "stale reviews dismissed on push",
-      "review-thread resolution required",
-      "extra approval required for unattributed changes",
-      "owner and authorized ChatGPT integration have PR-only bypass"
-    ],
-    "remaining_rule_difference": "Sibling CUDA-family PR-review rulesets enable code-owner review; CUDA-Algorithms currently has it disabled.",
-    "remaining_repository_settings": [
-      "enable auto-merge",
-      "disable merge commits",
-      "enable update-branch support",
-      "enable delete-branch-on-merge",
-      "require web commit signoff",
-      "disable wiki",
-      "enable discussions"
-    ],
-    "already_matching_repository_settings": [
-      "squash merge enabled",
-      "rebase merge enabled"
-    ],
-    "required_checks": "none until real local CI exists; do not fabricate check names",
-    "constraint": "Current connected GitHub integration can read repository/ruleset state but does not expose administration/ruleset mutation."
+    "status": "main_protected_remaining_admin_parity_not_blocking_design",
+    "required_checks": "none until real local CI exists; do not fabricate check names"
   },
-  "current_focus": {
-    "issue": 3,
-    "status": "consumer_profile_selection_after_governance_alignment",
-    "next_action": "Select one bounded reusable algorithm profile from materially different consumer needs; define exact semantics, resource bounds, reference behavior, falsifiers and qualification before production implementation."
-  },
-  "candidate_consumers": [
-    "Connect4 BSFP/NDC ranked closure and canonicalization pipeline",
-    "CUDA-DATA sequence/keyed primitives",
-    "CUDA-GRAPH-ANALYTICS frontier/workset/fixed-point machinery"
-  ],
   "do_not": [
+    "freeze prototype APIs for compatibility",
     "make BSFP or any first consumer the public vocabulary",
+    "treat hashes as exact equality",
+    "require host readback between GPU stages merely to obtain active counts",
     "move generic CUDA/Device-JS/runtime/provider mechanisms here",
     "move Tensor, dataframe, graph-analysis, search or game-proof semantics here",
     "implement generic physical placement/spill policy here; CUDA-MM is the reserved owner if activated",
     "add Python, repository-local C/C++/CUDA/PTX/native FFI, private lower imports or vendor-native passthrough",
-    "claim implementation, support, performance or full repository-governance parity without corresponding evidence"
+    "claim implementation, support or performance from Working Draft design alone"
   ]
 }
