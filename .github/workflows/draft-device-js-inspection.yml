@@ -1,0 +1,49 @@
+name: draft-device-js-inspection
+
+on:
+  push:
+    branches:
+      - design/first-algorithm-profile
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CUDA-Algorithms
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Checkout exact CUDA-JS authority
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: iteathen/CUDA-JS
+          ref: 97c0295ab79add204d4d8ced080a4da4b66149cf
+          path: cuda-js
+
+      - name: Use supported Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26.7.0
+
+      - name: Install exact CUDA-JS dependencies
+        run: npm ci --prefix cuda-js
+
+      - name: Inspect first Device-JS slice
+        run: |
+          node --input-type=module <<'EOF'
+          import { inspectDeviceProgram } from './cuda-js/components/runtime-facade/index.mjs';
+          import { deviceProgramRequest } from './experiments/first-gpu-slice/device-program.mjs';
+
+          const inspected = inspectDeviceProgram(deviceProgramRequest);
+          const result = {
+            cudaJsCommit: '97c0295ab79add204d4d8ced080a4da4b66149cf',
+            node: process.version,
+            contract: inspected.deviceProgram.contract,
+            sha256: inspected.deviceProgram.sha256,
+            kernels: inspected.deviceProgram.kernels,
+            publicHelperUsage: inspected.inspection.publicHelperUsage,
+          };
+          console.log(JSON.stringify(result, null, 2));
+          EOF
