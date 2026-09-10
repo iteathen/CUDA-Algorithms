@@ -1,6 +1,6 @@
 import { compileDeviceProgram } from 'cuda-js';
 import { stableOrderIndicesU32DeviceProgram, STABLE_ORDER_INDICES_U32_STATUS } from '../device/stable-order-indices-u32-program.mjs';
-import { binding, blockSize, closeResources, kernelByName, positiveSafeInteger, PREPARED_KERNEL_NODE_CEILING, requireU32View, U32_BYTES, u32Bytes } from '../internal/common.mjs';
+import { binding, blockSize, closeResources, kernelByName, positiveSafeInteger, PREPARED_KERNEL_NODE_CEILING, rejectSameViewWriteConflicts, requireU32View, U32_BYTES, u32Bytes } from '../internal/common.mjs';
 
 export const STABLE_LEXICOGRAPHIC_ORDER_INDICES_U32_CONTRACT = 'CUDA-Algorithms-stable-lexicographic-order-indices-u32-candidate-v0';
 
@@ -80,19 +80,30 @@ export async function createStableLexicographicOrderIndicesU32Plan(runtime, opti
     resultBinding,
     status: STABLE_ORDER_INDICES_U32_STATUS,
     realizationBounds: Object.freeze({ maxKeyWordCount: PREPARED_KERNEL_NODE_CEILING - 1, reason: 'current CUDA-JS prepared kernel DAG node ceiling' }),
+    aliasing: Object.freeze({ exactWriteConflictRejected: true, readReadSameViewAllowed: true, overlappingSiblingViews: 'requires CUDA-JS #260 before acceptance' }),
     async submit(bindings) {
       if (closed) throw new Error('stable ordering plan is closed');
       if (!Array.isArray(bindings?.keyWords) || bindings.keyWords.length !== keyWordCount) {
         throw new RangeError(`keyWords must contain exactly ${keyWordCount} u32 device views ordered most-significant to least-significant`);
       }
       const normalized = {};
+      const roles = [];
       for (let word = 0; word < keyWordCount; word += 1) {
-        normalized[`keyWord${word}`] = requireU32View(bindings.keyWords[word], recordCapacity, `keyWords[${word}]`, 'read');
+        const view = requireU32View(bindings.keyWords[word], recordCapacity, `keyWords[${word}]`, 'read');
+        normalized[`keyWord${word}`] = view;
+        roles.push({ label: `keyWords[${word}]`, view, access: 'read' });
       }
       normalized.indicesA = requireU32View(bindings.indicesA, indexCapacity, 'indicesA', 'read-write');
       normalized.indicesB = requireU32View(bindings.indicesB, indexCapacity, 'indicesB', 'read-write');
       normalized.activeCount = requireU32View(bindings.activeCount, 1, 'activeCount', 'read');
       normalized.status = requireU32View(bindings.status, 1, 'status', 'read-write');
+      roles.push(
+        { label: 'indicesA', view: normalized.indicesA, access: 'write' },
+        { label: 'indicesB', view: normalized.indicesB, access: 'write' },
+        { label: 'activeCount', view: normalized.activeCount, access: 'read' },
+        { label: 'status', view: normalized.status, access: 'write' },
+      );
+      rejectSameViewWriteConflicts(roles);
       return prepared.submit({ bindings: normalized });
     },
     async close() {
