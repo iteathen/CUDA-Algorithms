@@ -81,11 +81,11 @@ export async function createStableSelectIndicesU32Plan(runtime, options = {}) {
       if (closed) throw new Error('stable select plan is closed');
       const normalized = {
         flags: requireU32View(bindings?.flags, inputCapacity, 'flags', 'read'),
-        prefix: requireU32View(bindings?.prefix, inputCapacity, 'prefix', 'write'),
+        prefix: requireU32View(bindings?.prefix, inputCapacity, 'prefix', 'read-write'),
         activeCount: requireU32View(bindings?.activeCount, 1, 'activeCount', 'read'),
         outputIndices: requireU32View(bindings?.outputIndices, outputCapacity, 'outputIndices', 'write'),
         outputCount: requireU32View(bindings?.outputCount, 1, 'outputCount', 'write'),
-        status: requireU32View(bindings?.status, 1, 'status', 'write'),
+        status: requireU32View(bindings?.status, 1, 'status', 'read-write'),
       };
       rejectSameViewWriteConflicts([
         { label: 'flags', view: normalized.flags, access: 'read' },
