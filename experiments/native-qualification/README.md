@@ -5,32 +5,35 @@
 
 ## Purpose
 
-Execute the current maintained correctness-first CUDA-Algorithms candidate plans on directly accessible CUDA hardware and compare physical GPU results against the independent JavaScript reference semantics.
+Execute the maintained correctness-first CUDA-Algorithms Candidate plans on directly accessible CUDA hardware and compare physical GPU results against independent JavaScript reference semantics.
 
 This harness is deliberately separate from production execution. It may call `operation.wait()` and perform D2H reads because its job is to qualify results. The GPU-owned production design still forbids a synchronous Node semantic-advancement loop.
 
 ## Authority and package requirement
 
-Run against the current gate-32-approved CUDA-JS revision used by portable candidate evidence:
+Run against the exact CUDA-JS revision currently used by Candidate portable evidence:
 
 ```text
-e9837f20acf7901d445a1e7a2045459a1ae0118a
-cuda-js@0.1.0-alpha.19
+98e2ebc942c14d63acf4dd82e912dd548c363a05
+cuda-js@0.1.0-alpha.20
+Node v26.7.0
 ```
 
-CUDA-JS records the exact Windows x64 / GTX 1660 Ti / driver 610.74 / CUDA 13.3 / Node 26.7.0 physical compatible pair as passed, reviewed and owner-approved at that revision. That lower evidence establishes that the required public CUDA-JS runtime/compiler/execution substrate is physically available on the recorded host profile; it does **not** automatically qualify CUDA-Algorithms results.
+CUDA-JS's earlier gate-32 evidence proves its recorded alpha.19 Windows x64 / GTX 1660 Ti / driver 610.74 / CUDA 13.3 / Node 26.7.0 compatible pair. Alpha.20 adds the public pure `inspectDeviceViewRelation` facade stud and remains the exact lower revision CUDA-Algorithms now consumes.
 
-`cuda-js` must resolve through its **public package exports**. A local exact checkout may be linked/installed as the `cuda-js` package; do not change this harness to import CUDA-JS private repository files.
+Do not silently treat the old alpha.19 package evidence as alpha.20 qualification. The CUDA-Algorithms physical run must record the exact alpha.20 source/package/profile it actually exercises.
+
+`cuda-js` must resolve through its **public package exports**. A local exact checkout may be linked/installed as the `cuda-js` package; do not import CUDA-JS private repository files.
 
 ## Run
 
-On a host satisfying the selected CUDA-JS native profile and supported Node version:
+On the directly accessible Windows CUDA host with the exact lower revision bound as the public package:
 
 ```text
 node experiments/native-qualification/run.mjs
 ```
 
-The harness imports the maintained `src/` candidate surface rather than the neighboring prototype plans.
+The harness imports the maintained `src/` Candidate surface rather than neighboring prototype plans.
 
 ### Stable select / device-resident active extent
 
@@ -65,25 +68,30 @@ Exercises:
 - zero active items;
 - invalid indirect-index detection before key dereference.
 
-Key-word views are supplied most-significant to least-significant. The candidate plan performs stable passes in reverse significance and reports `resultBinding`, identifying which ping-pong index view contains the final permutation.
+Key-word views are supplied most-significant to least-significant. The Candidate plan performs stable passes in reverse significance and reports `resultBinding`, identifying which ping-pong index view contains the final permutation.
 
 For valid cases it compares final device indices against `reference/permutation-ordering.mjs`.
 
-## Current alias boundary
+## Alias boundary exercised before native launch
 
-The maintained candidate rejects exact same-view conflicts whenever either logical role writes. Pure read/read same-view reuse remains legal.
+The maintained Candidate consumes CUDA-JS public `inspectDeviceViewRelation` and requires:
 
-Distinct sibling views that overlap one underlying allocation cannot yet be classified from the current public CUDA-JS view surface. That consumer-neutral lower relation is tracked as `iteathen/CUDA-JS#260`. A native pass must therefore not be promoted into a claim that every possible overlapping sibling-view conflict is already detected.
+```text
+read + read: overlap may be permitted
+any pair involving write: relation must be disjoint
+```
+
+Same-range or partially overlapping write-conflicting views fail before algorithm submission. CUDA-Algorithms owns that policy; CUDA-JS owns the byte-range fact.
 
 ## Evidence output
 
 The script emits one bounded JSON result containing fixture names/statuses and the final pass/fail outcome. It intentionally avoids printing hostnames, account paths, device UUIDs, PCI identifiers or other unnecessary host identity.
 
-A passing run qualifies only the exact CUDA-Algorithms source / CUDA-JS / Node / GPU / driver / provider profile actually executed. Record those profile facts separately according to CUDA-JS hardware-evidence policy; do not infer broader support.
+A passing run qualifies only the exact CUDA-Algorithms source / CUDA-JS / Node / GPU / driver / provider profile actually executed. Do not infer broader support.
 
 ## Failure handling
 
-The first failure must be treated as evidence. Do not weaken a fixture merely to obtain green output.
+The first failure is evidence. Do not weaken a fixture merely to obtain green output.
 
 Classify whether the first divergence is:
 
