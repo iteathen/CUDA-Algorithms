@@ -1,81 +1,115 @@
 # Device-view alias ownership boundary evidence
 
 **Date:** 2026-09-09
-**Status:** Durable design/qualification evidence; not specification authority
+**Status:** Durable design/qualification evidence; lower relation resolved on CUDA-JS main; not specification authority
 
 ## Question
 
-Can CUDA-Algorithms enforce a consumer-level non-alias contract using only the current public CUDA-JS device-view and prepared-DAG surfaces?
+Can CUDA-Algorithms enforce a consumer-level non-alias contract using only public CUDA-JS device-view capabilities without importing private allocation identity?
 
-## Exact lower authority exercised
+## Phase 1 — falsifier before CUDA-JS #260
+
+Exact lower authority:
 
 - CUDA-JS commit: `e9837f20acf7901d445a1e7a2045459a1ae0118a`
 - package identity: `cuda-js@0.1.0-alpha.19`
 - Node: `v26.7.0`
-- CUDA-Algorithms branch: `design/first-algorithm-profile`
-- cleanup-safe falsifier commit: `f5477e5afe0f2f87fc0171a0c986acac0f5e5264`
+- CUDA-Algorithms cleanup-safe falsifier commit: `f5477e5afe0f2f87fc0171a0c986acac0f5e5264`
 - GitHub Actions run: `34423412784`
 
-The run used the public CUDA-JS testing facade and prepared-DAG surface. This is portable orchestration evidence, not native GPU evidence.
-
-## Result
-
-The falsifier intentionally bound the same public `u32` device view to the stable-selection experiment as both:
+The falsifier bound one public `u32` view simultaneously as:
 
 - `flags`: read role; and
 - `prefix`: write role.
 
-CUDA-JS accepted the prepared submission. The test therefore failed with the intended diagnostic:
+CUDA-JS prepared submission accepted the binding. The test failed with the intended diagnostic:
 
 > CUDA-JS prepared submission accepted a same-view read/write alias inside one algorithm node
 
-The surrounding reference, maintained-candidate, Device-JS inspection and ordinary prepared-composition checks remained green.
+This did **not** contradict the prepared-DAG contract. CUDA-JS owned concrete view/range validity and DAG hazard ordering; CUDA-Algorithms owned whether its logical roles were permitted to alias.
 
-## Interpretation
-
-This does **not** contradict the accepted CUDA-JS prepared-DAG contract. CUDA-JS owns concrete view/range validation and operation/DAG hazard ordering. CUDA-Algorithms owns whether a particular algorithm permits its logical roles to alias within one kernel/algorithm invocation.
-
-The public `CudaDeviceView` intentionally does not expose its parent allocation/native identity. Therefore an upper library can directly recognize an exact same JavaScript view object, but it cannot reliably determine whether two different public sibling views overlap the same underlying allocation.
-
-That is the actual missing stud.
+The real missing stud was that public views hid parent allocation identity, so an upper library could recognize the exact same JavaScript object but could not classify two different sibling views as same-range, overlap or disjoint.
 
 ## LEGO disposition
 
 ### CUDA-Algorithms owns
 
-- whether an algorithm permits input/output/workspace/control aliasing;
-- fail-closed admission when an observable relation violates that policy;
-- keeping read/read reuse legal when the algorithm permits it.
+- whether an algorithm permits input/output/workspace/control ranges to overlap;
+- fail-closed algorithm admission when a prohibited relation is observed;
+- allowing read/read reuse where the algorithm permits it.
 
 ### CUDA-JS owns
 
-- allocation/view range truth;
+- allocation/view byte-range truth;
 - parent/runtime/device/generation identity;
-- a consumer-neutral relation between two public view capabilities if that relation is exposed.
+- the consumer-neutral relation between two public view capabilities.
 
-CUDA-Algorithms must not recover private parent identity, import lower internals, or invent a second allocation registry merely to enforce alias policy.
+CUDA-Algorithms must not recover private parent identity, import CUDA-JS internals, maintain a shadow allocation registry, or expose native addresses to enforce its policy.
 
-## Immediate candidate behavior
+## Phase 2 — CUDA-JS #260 resolved
 
-The maintained candidate API rejects **exact same-view conflicts when either role writes**. Pure read/read reuse remains legal.
+CUDA-JS issue #260 was implemented and merged by PR #261 at:
 
-This is deliberately narrower than a full non-overlap guarantee. Two distinct sibling views that overlap cannot yet be classified by CUDA-Algorithms from public facts alone.
+```text
+98e2ebc942c14d63acf4dd82e912dd548c363a05
+cuda-js@0.1.0-alpha.20
+```
 
-The broader relation is tracked as:
+The public stud is:
 
-- `iteathen/CUDA-JS#260` — **Device views: expose consumer-neutral range relation for upper-layer alias validation**.
+```text
+inspectDeviceViewRelation(a, b)
+  -> "same-range" | "overlap" | "disjoint"
+```
 
-Until a consumer-neutral lower relation exists and is qualified, CUDA-Algorithms must not claim that it detects every overlapping sibling-view conflict.
+The lower implementation validates live same-runtime public capabilities using private parent/range truth, performs no actor/native call for the relation, exposes no parent/native identity, and fails closed for incomparable/stale/closing/closed capabilities.
 
-## Why no CUDA-JS workaround was copied here
+CUDA-JS keeps the **fact** neutral. It does not decide whether an upper algorithm admits the relation.
 
-A local wrapper registry, hidden parent token, pointer comparison, private import, or native escape would violate LEGO ownership and SPEC-0001. The correct response is to protect what can be proven locally and route the missing generic fact to its natural lower owner.
+## Current CUDA-Algorithms Candidate policy
+
+The maintained Candidate now consumes `inspectDeviceViewRelation` directly.
+
+For every pair of logical roles:
+
+```text
+read + read:
+  overlap/same-range may be admitted by the algorithm
+
+anything involving a write:
+  relation must be disjoint
+  same-range or overlap => reject before prepared submission
+```
+
+This covers both exact same-object aliases and distinct sibling views that partially overlap or represent the same byte range.
+
+Portable candidate tests include:
+
+- same-range write-conflict rejection;
+- partially overlapping sibling-view rejection;
+- legal read/read reuse;
+- ordinary disjoint bindings.
+
+## Why the ownership split matters
+
+The solution did not widen CUDA-Algorithms with lower memory identity and did not widen CUDA-JS with algorithm policy.
+
+```text
+CUDA-JS:        what is the byte-range relation?
+CUDA-Algorithms: is that relation legal for this algorithm?
+```
+
+That is the intended LEGO boundary.
 
 ## Qualification consequence
 
-This evidence supports Candidate-level development of the first primitive surface, but full alias-contract acceptance remains scoped:
+The previous alias blocker for Candidate acceptance is now resolved at the public-contract level.
 
-- exact same-view write conflicts: enforceable now;
-- pure read/read same-view reuse: permitted;
-- distinct overlapping sibling views: pending CUDA-JS #260 or an equally consumer-neutral public mechanism;
-- native CUDA-Algorithms result correctness: separately unqualified until the maintained physical harness is run.
+Remaining acceptance work is primarily:
+
+- portable requalification against exact CUDA-JS alpha.20;
+- maintained CUDA-Algorithms physical result qualification on an exact CUDA profile;
+- graceful operation/plan/runtime cleanup evidence;
+- final review of the public alias policy at the tested revision.
+
+CUDA-JS's earlier gate-32 Windows physical evidence is tied to its recorded alpha.19 compatible pair. The new alpha.20 view relation is a pure host-side facade relation with no native work; CUDA-Algorithms must still record the exact alpha.20 revision used by its own physical run rather than silently transferring an old package qualification.
