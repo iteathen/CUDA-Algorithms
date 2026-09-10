@@ -20,7 +20,7 @@
     "src/"
   ],
   "scripts": {
-    "test:reference": "node --test reference/core-primitives.test.mjs reference/permutation-ordering.test.mjs reference/grouping-boundary.test.mjs",
+    "test:reference": "node --test reference/core-primitives.test.mjs reference/permutation-ordering.test.mjs reference/grouping-boundary.test.mjs reference/ranked-index-closure.test.mjs",
     "test:candidate": "node --test test/candidate-api.test.mjs",
     "verify:documents": "node tools/verify-documents.mjs"
   }
