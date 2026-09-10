@@ -1,273 +1,185 @@
 # SPEC-0002: Algorithm Plans, Active Extents, and Device Chaining
 
-**Status:** Working Draft
+**Status:** Candidate
 **Date:** 2026-09-09
 **Issue:** #3
 
-> This document is intentionally mutable during the first implementation cycle. It is not accepted production authority and carries no compatibility promise until promoted to Candidate and then Accepted.
+> Candidate means this contract is stable enough for maintained implementation and native qualification, but it is not yet accepted compatibility authority. Breaking corrections remain allowed before acceptance when evidence exposes a better design.
 
 ## Outcome
 
-Define the common provider-neutral execution contract shared by CUDA-Algorithms families without creating a second CUDA runtime, memory model, operation lifecycle, tensor model, or consumer scheduler.
+Define the common provider-neutral execution contract for CUDA-Algorithms plans without creating a second CUDA runtime, memory model, operation lifecycle, tensor model, record model, or consumer scheduler.
 
-The central design requirement is that one GPU-produced logical extent/result may feed later GPU work without a mandatory host readback or host semantic advancement step.
+The key requirement is that GPU-produced counts/status can feed later GPU work without a mandatory host readback or host semantic advancement step.
 
-## Ownership
+## LEGO ownership
 
 CUDA-Algorithms owns:
 
-- immutable logical algorithm-plan semantics;
-- input/output roles and active-extent meaning;
-- algorithm-specific workspace requirements;
-- stability/determinism policy;
-- device-chainable result/count semantics;
-- algorithm-level resource-pressure and semantic-status meaning.
+- algorithm-plan semantics and algorithm-family identity;
+- logical input/output/workspace/control roles;
+- host-known capacities and device-resident active-extent meaning;
+- algorithm semantic status and deterministic/stability requirements;
+- algorithm-specific workspace and realization bounds.
 
 CUDA-JS owns:
 
-- device allocations and typed views;
-- Device-JS compilation/linking;
-- native providers and CUDA mechanisms;
-- stream/event/operation scheduling;
-- transfer mechanics;
-- publication mailboxes;
-- native failure provenance and cleanup.
+- allocations, device views and their private parent/range truth;
+- Device-JS parsing/lowering/compilation/linking;
+- modules/functions, prepared execution and operation lifecycle;
+- native providers, streams/events, transfers, memory ordering and cleanup.
 
-CUDA-Algorithms must not expose raw native addresses, CUDA streams/events, provider objects, CUB types, PTX, CUDA C++ or private CUDA-JS state.
+A CUDA-Algorithms plan may compose CUDA-JS capabilities but must not expose or recreate their private/native authority.
 
-## Data binding
+## Candidate plan shape
 
-The first profile operates on public CUDA-JS device allocations/views.
-
-Algorithm plans describe logical roles such as:
+The maintained first profile uses a JavaScript object conceptually equivalent to:
 
 ```text
-input
-output
-key
-index
-flag
-count
-workspace
-status/control
+CudaAlgorithmsPlan
+  kind
+  contract / family
+  finite capacities and dtype facts
+  workspace / realization metadata
+  semantic status vocabulary
+  submit(bindings) -> Promise<CudaOperation>
+  close() -> Promise<void>
 ```
 
-These are algorithm roles, not new memory-capability types.
+`submit()` returns the ordinary CUDA-JS operation. CUDA-Algorithms does not wrap that operation in a competing pending/completed/failed lifecycle.
 
-A plan must not infer tensor shape, table schema, graph meaning, proof-record meaning, or consumer ownership from a view.
+Plan creation may asynchronously compile/load/prepare bounded lower resources. Plan close owns release of resources created for that plan and must preserve lower cleanup failure truth.
 
-## Active extent
+## Device-resident active extent
 
-Every sequence-like operation has:
+The first maintained candidate uses:
 
 ```text
-capacity       maximum item count addressable by the bound buffers
-active extent number of logically active items for this invocation
+activeCount: one-element u32 CUDA-JS device view
+capacity:    positive host-known safe integer
 ```
-
-The active extent may be represented in one of two forms.
-
-### Host-fixed extent
-
-A host-known non-negative safe integer validated before submission.
 
 Requirements:
 
-- `active <= capacity`;
-- all bound views cover the required active range;
-- all arithmetic used to derive byte ranges/workspace is checked;
-- invalid requests reject before native work.
+- kernels consume `activeCount` directly on device;
+- Node does not need to read the count between algorithm stages;
+- every stage proves/guards `activeCount <= capacity` before dereferencing outside the declared range;
+- invalid extent becomes algorithm semantic failure, not wrap/truncation;
+- zero active items are semantically valid even though physical buffers/launch geometry remain positively bounded;
+- a local `u32` count does not impose a `u32` limit on an out-of-core or multi-shard logical problem.
 
-### Device-resident extent
+A later `u64` active-count profile requires its own maintained implementation/evidence; it is not implied by the reference oracle alone.
 
-A one-element CUDA-JS device view containing an unsigned `u32` or `u64` count plus a host-known capacity bound.
+## Node nonblocking / GPU-owned mathematics
 
-Requirements:
+Production plan methods must not synchronously block the Node event loop waiting for GPU completion and must not perform the mathematical content of the advertised GPU algorithm on CPU.
 
-- later GPU stages consume the count directly on device;
-- Node is not required to read the count between stages;
-- the plan declares the count width and maximum capacity;
-- every implementation guards `count <= capacity` before touching items beyond the bound;
-- over-capacity state must become an explicit semantic failure/status and must never silently truncate or wrap;
-- a downstream stage in the same device chain must observe upstream failure/status and avoid manufacturing a valid result from invalid inputs.
+Node may:
 
-The implementation shape of the device status/control record is deliberately not frozen in this Working Draft.
+- validate/normalize finite plan facts;
+- create/bind lower capabilities;
+- submit operations;
+- register asynchronous observation;
+- administer persistence, checkpoint and bounded epoch transitions.
 
-## Count widths
+Node may not read item records/counts merely to decide mathematical survivor sets, ordering, grouping, predecessor choices or fixed-point progression for a profile advertised as GPU-owned.
 
-`u32` and `u64` are both candidate count/index widths.
+Qualification harnesses may deliberately call `wait()` and perform D2H reads to compare GPU results against independent oracles. That is evidence code, not production execution semantics.
 
-A plan may select `u32` where its explicit capacity proves the value fits. Large logical problems may be sharded into bounded batches without forcing every local index to `u64`.
+## Runtime completion versus algorithm validity
 
-No public contract may imply that `u32` local counts limit the total size of an out-of-core or multi-shard problem.
+CUDA operation terminality and algorithm semantic validity are separate facts.
 
-## Device chaining
-
-A device-chainable operation writes its produced count and semantic status to device-resident state that later operations can consume without host interpretation.
-
-Conceptually:
+A lower operation may complete successfully while the algorithm status reports, for example:
 
 ```text
-producer
-  -> device count/status
-  -> algorithm A
-  -> device count/status
-  -> algorithm B
-```
-
-The host may submit/prepare the operations and may asynchronously observe administrative progress, but correctness must not require a host data-dependent loop over item records or produced counts.
-
-## Host nonblocking rule
-
-CUDA-Algorithms production execution must not synchronously block the Node event loop waiting for GPU completion.
-
-Host-side JavaScript may perform bounded administration such as:
-
-- plan normalization;
-- capability validation;
-- allocation request orchestration;
-- asynchronous submission;
-- registration of completion/status observation;
-- checkpoint or persistence administration.
-
-It must not perform the mathematical content of a GPU-owned algorithm while pretending that work is GPU-resident.
-
-## Algorithm semantic status
-
-The common model must distinguish native operation completion from algorithm semantic validity.
-
-Candidate semantic states include:
-
-```text
-ok
 invalid-extent
-overflow
 capacity-exhausted
-budget-yield
-converged
-administrative-yield
+invalid-input
 ```
 
-Not every primitive admits every state. Exact spelling and the physical device representation remain open in this Working Draft.
+No family may manufacture a valid success payload from an error state unless that exact partial-result meaning is specified.
 
-A CUDA operation can complete successfully at the runtime level while its algorithm result reports a bounded semantic condition such as `capacity-exhausted`; the library must not collapse these categories.
+For capacity failure, a family may preserve an independently valid required count for administration while declaring payload output invalid; silent truncation is forbidden.
 
-### Device status/control access discipline
+## Status/control access discipline
 
-The first GPU-facing prototype exposed an important memory-model requirement: a status/control location that can be observed and updated by multiple threads in one kernel must use one coherent accepted access discipline for that concurrent region.
+When multiple GPU threads can observe/update the same status/control location in one kernel:
 
-For Device-JS implementations using an ordinary device-memory status word:
+- use one compatible accepted CUDA-JS atomic access discipline for the concurrent region;
+- do not mix ordinary concurrent access with atomic access to that same location;
+- a separately ordered single-thread initialization kernel may initialize before the concurrent region;
+- first-error publication may use compare-and-swap from `ok` to preserve the first observed semantic failure;
+- stronger acquire/release/system semantics are required only when the actual cross-location/publication contract needs them.
 
-- concurrent observations/updates of the same status location must use accepted CUDA-JS atomic helpers with compatible dtype/scope/order semantics;
-- do not mix atomic operations with non-atomic concurrent access to the same location;
-- an ordered single-thread initialization kernel may initialize the word non-atomically when no concurrent access exists and the next kernel is ordered by the lower CUDA-JS execution contract;
-- first-error publication may use compare-and-swap from `ok` to an error code so racing error reporters cannot silently overwrite an earlier failure;
-- downstream kernels that consume a concurrently published device status use an accepted atomic observation form rather than an ordinary load while concurrent publication is possible;
-- stronger acquire/release/system semantics are not implied unless cross-location ordering or host/device publication actually requires them.
+The current candidate implementations use CUDA-JS device-scope relaxed atomic observation plus CAS for same-location algorithm status. CUDA-JS remains authoritative for those memory-model semantics.
 
-This is an algorithm-level requirement to use the lower memory model correctly, not a CUDA-Algorithms-owned atomic API. CUDA-JS remains authoritative for the available atomic helper semantics and native lowering.
+## Data binding and access
 
-A semantic payload produced while status is non-`ok` is invalid unless the owning family explicitly defines a valid partial-result state. Capacity or validation failure must not become success-shaped data merely because some threads wrote output before the failure was observed.
+Candidate plans bind public one-dimensional CUDA-JS device views and must validate the public facts they rely on, including dtype, minimum element capacity and access authority.
 
-The physical status encoding remains a Working Draft detail. What is stable at this stage is the separation between runtime terminality and algorithm semantic validity plus the requirement for a coherent concurrent access discipline.
+Whole-plan access truth must be stated honestly. A workspace written in one stage and read in a later stage requires a read-write view even if an individual kernel sees only one direction.
 
-## Workspace
+## Aliasing boundary
 
-Every plan states its logical workspace requirement as a bounded byte/alignment record derived from material inputs such as:
+Algorithm alias policy belongs to CUDA-Algorithms; underlying allocation/view relation truth belongs to CUDA-JS.
 
-```text
-algorithm family/version
-input/output dtype
-capacity
-selected stability/determinism policy
-provider-independent algorithm variant where semantic
-```
+The maintained candidate can currently prove and enforce:
 
-The first expert profile should prefer explicit workspace binding/reuse over hidden unbounded allocation.
+- exact same public view object + at least one writing role => reject before algorithm submission;
+- exact same public view object used only by read roles => allowed when the family permits it.
 
-CUDA-Algorithms may request ordinary CUDA-JS memory for convenience, but CUDA-JS retains physical allocation/lifecycle ownership. A future CUDA-MM profile may optimize placement/reuse from the logical requirements without changing algorithm meaning.
+Current public CUDA-JS views intentionally hide parent allocation identity. Therefore two distinct sibling views cannot yet be classified by CUDA-Algorithms as disjoint/overlapping/contained.
 
-## Aliasing and access
+The missing consumer-neutral relation is tracked by `iteathen/CUDA-JS#260`. Until that or an equivalent lower capability is accepted and consumed, the first CUDA-Algorithms candidate must **not** claim full detection of overlapping sibling-view aliases.
 
-Each operation must declare exact logical access roles and accepted aliasing.
+CUDA-Algorithms must not build a private parent-token registry, deep-import CUDA-JS internals, or expose native addresses to work around this boundary.
 
-Default rule: overlapping input/output ranges reject unless the specific algorithm contract explicitly defines in-place semantics.
+## Bounded resources and realization limits
 
-Provider behavior cannot silently widen or narrow the public aliasing contract.
+Every plan exposes finite logical workspace/capacity requirements relevant to callers. Provider/runtime implementation ceilings must be identified as realization limits rather than mathematical limits.
 
-## Determinism and stability
+Example: current stable multiword ordering uses one reset node plus one prepared kernel node per key word. Under the accepted CUDA-JS 32-node prepared-DAG profile, that realization admits at most 31 words per submitted plan. This does **not** define the semantic maximum width of lexicographic keys.
 
-Every plan records the determinism/stability requirements material to the result.
+No hidden queue, scratch growth, retry loop or allocation may be unbounded.
 
-Candidate dimensions include:
+## Determinism
 
-```text
-stable-order-required
-stable-order-not-required
-exact-integer-deterministic
-run-to-run-deterministic
-cross-device-deterministic
-provider-permitted-nondeterministic
-```
+The first candidate integer profile requires exact deterministic outputs and, where specified by the family, stable relative ordering.
 
-The first profile should avoid floating-point reduction promises until the exact grouping/reproducibility contract is justified.
+Provider-private work assignment, block size, digit width, internal materialization and later accelerators may vary without changing the accepted semantic result.
 
-## Plan identity
+Floating-point reduction/reassociation policy is outside this Candidate.
 
-A normalized algorithm plan has deterministic semantic identity over every material public fact, including at least:
+## Evidence supporting Candidate status
 
-```text
-contract/family version
-operation kind
-input/output role schema
-dtypes
-count/index width
-capacity and active-extent form
-ordering direction/bit range where applicable
-stability/determinism policy
-aliasing contract
-workspace contract
-semantic-status contract
-```
+The common contract has now been exercised by two maintained algorithm families and mapped to materially different consumers (BSFP-style record/index processing, CUDA-DATA-style row/column processing, and graph/frontier processing).
 
-Native handles, addresses, streams, generated CUDA source and provider-private tuning do not enter provider-neutral semantic identity.
+Portable evidence against CUDA-JS `e9837f20acf7901d445a1e7a2045459a1ae0118a` / Node `v26.7.0` includes:
 
-A separately materialized execution/provider identity may include lower compatible-profile facts where required for cache/evidence truth.
+- 23/23 deterministic reference tests;
+- 5/5 maintained candidate API tests;
+- accepted Device-JS inspection for the current status/ordering kernels;
+- public CUDA-JS prepared-DAG composition;
+- explicit exact-view write-conflict and legal read/read alias tests;
+- physical qualification harness syntax validation.
 
-## Execution/lifecycle composition
+The alias falsifier and ownership disposition are recorded in `docs/evidence/2026-09-09-device-view-alias-boundary.md`.
 
-CUDA-Algorithms must reuse CUDA-JS operation ownership. It must not create a competing definition of submitted/pending/completed/failed native work.
+This is **not** native CUDA-Algorithms result evidence.
 
-If an algorithm requires multiple kernel/transfer/library operations, its plan may compose them through accepted CUDA-JS dependency/prepared-execution mechanisms. Any higher convenience object represents algorithm planning/result metadata only and must not become a second native-operation lifecycle authority.
+## Acceptance gate
 
-## Reference semantics
+Before this specification becomes Accepted:
 
-Each accepted algorithm family requires a deterministic JavaScript/TypeScript reference implementation or another independently understandable oracle for its semantic claims.
+1. run the maintained physical qualification harness on an exact directly accessible CUDA profile;
+2. compare produced results against the independent reference semantics;
+3. prove operation/plan/runtime cleanup on the same run;
+4. resolve or explicitly narrow the distinct-sibling-view alias contract using CUDA-JS #260 or equivalent evidence;
+5. review the resulting public surface and realization bounds at an exact revision.
 
-Reference execution is qualification evidence and development support. It is not a required CPU production fallback for GPU-owned consumers.
+Performance is separately gated. A correctness pass does not justify throughput claims.
 
-## Mutable-draft rule
+## Change rule before acceptance
 
-While this specification is `Working Draft`:
-
-- exact class/function names are non-authoritative;
-- status-record physical layout is open;
-- count/control representation may change;
-- workspace shapes may change;
-- the spec may be split if implementation demonstrates a real ownership seam;
-- dependent prototype evidence must record the exact draft revision it tested.
-
-Promotion to Candidate requires at least one real primitive implementation/prototype and mappings from at least two materially different consumers.
-
-Promotion to Accepted requires exact reference conformance, bounded failure/resource behavior, public CUDA-JS composition evidence, and review of the resulting stable public surface.
-
-## Falsifiers
-
-Rework this contract if:
-
-- device-resident active extents cannot be validated without host semantic participation;
-- algorithm status requires a second CUDA/native lifecycle abstraction;
-- common plan fields become mostly family-specific ceremony;
-- arbitrary consumer metadata begins leaking into the common plan;
-- workspace ownership cannot remain cleanly separated from physical memory management;
-- the nonblocking/device-chaining contract cannot be realized through public CUDA-JS mechanisms.
+Candidate names/layouts may still break when evidence identifies a correctness, ownership, capacity, lifecycle or materially better LEGO boundary. Do not add compatibility shims for alpha-only mistakes without a real external beneficiary.
