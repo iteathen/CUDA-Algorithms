@@ -147,19 +147,31 @@ The grouping-boundary reference fixtures showed the same generic segmentation me
 
 ## Aliasing
 
-Exact same public view object reuse is allowed only when every involved role is read-only.
+CUDA-Algorithms owns whether its logical roles may overlap; CUDA-JS owns the underlying byte-range relation.
 
-Any exact same-view pair where at least one role writes is rejected by the maintained Candidate before prepared submission.
+The Candidate consumes public CUDA-JS:
 
-For ordering, this means in particular:
+```text
+inspectDeviceViewRelation(a, b)
+  -> "same-range" | "overlap" | "disjoint"
+```
 
-- `indicesA` and `indicesB` must not be the same view;
-- a key view must not also be either mutable index buffer or status;
-- repeated read-only key views are legal.
+Policy:
 
-For selection, mutable prefix/output/control roles must not be the same view as another role that conflicts through writing; read-only reuse remains legal.
+- read-only roles may share or overlap ranges when the family permits read reuse;
+- if either role writes, the two ranges must be `disjoint`;
+- `same-range` or `overlap` with a writing role rejects before prepared submission;
+- lower relation errors for stale/cross-runtime/incomparable views propagate fail-closed.
 
-Distinct overlapping sibling views cannot yet be classified from current public CUDA-JS facts. Full overlap admission/rejection remains gated by `iteathen/CUDA-JS#260` and SPEC-0002.
+For ordering this means, among other cases:
+
+- `indicesA` and `indicesB` must be disjoint ranges;
+- key ranges must be disjoint from mutable index/status ranges;
+- repeated or overlapping read-only key ranges are legal.
+
+For selection, mutable prefix/output/control ranges must be disjoint from every conflicting role; read/read reuse remains legal.
+
+Portable Candidate evidence exercises both exact same-range conflicts and partially overlapping sibling views.
 
 ## Bounds
 
@@ -204,28 +216,31 @@ CUDA thread scheduling, physical stream overlap, block size and provider-private
 
 ## Candidate evidence
 
-Portable qualification against CUDA-JS `e9837f20acf7901d445a1e7a2045459a1ae0118a`, Node `v26.7.0`:
+Portable qualification against CUDA-JS `98e2ebc942c14d63acf4dd82e912dd548c363a05`, `cuda-js@0.1.0-alpha.20`, Node `v26.7.0`:
 
 - 23/23 independent/reference semantic tests passed;
-- 5/5 maintained candidate API tests passed;
+- 6/6 maintained Candidate API tests passed;
 - Device-JS frontend inspection passed;
 - public prepared-DAG composition passed;
 - stable multiword/duplicate-heavy ordering matched independent oracles;
-- exact-view write-conflict rejection and legal read/read reuse passed;
-- physical maintained-candidate qualification harness is syntax-valid.
+- same-range write-conflict rejection passed;
+- partially overlapping sibling-view rejection passed through lower-owned range truth;
+- legal read/read reuse passed;
+- physical maintained-Candidate qualification harness is syntax-valid.
 
-Current inspected Device-JS identities for the correctness prototypes are recorded in evidence; frontend identity is not native result evidence.
+The historical alias falsifier and CUDA-JS #260 resolution are recorded in `docs/evidence/2026-09-09-device-view-alias-boundary.md`.
+
+Frontend/mock identity is not native result evidence.
 
 ## Native acceptance gate
 
 Before this specification becomes Accepted:
 
-1. run the maintained physical harness on the exact qualified Windows CUDA-JS substrate or another separately qualified profile;
+1. run the maintained physical harness using the exact CUDA-JS revision under test on a directly accessible CUDA profile;
 2. compare selection prefix/count/indices/status and multiword ordering results against independent references;
 3. include invalid extent/flag/index and capacity-pressure cases;
-4. require graceful plan/runtime cleanup;
-5. resolve or explicitly narrow the distinct-sibling-view alias contract;
-6. review the final public surface at the tested revision.
+4. require graceful operation/plan/runtime cleanup;
+5. review the final public surface and alias policy at the tested revision.
 
 ## Deferred algorithm families
 
