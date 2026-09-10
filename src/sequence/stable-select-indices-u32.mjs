@@ -1,6 +1,6 @@
 import { compileDeviceProgram } from 'cuda-js';
 import { stableSelectIndicesU32DeviceProgram, STABLE_SELECT_INDICES_U32_STATUS } from '../device/stable-select-indices-u32-program.mjs';
-import { binding, blockSize, closeResources, kernelByName, positiveSafeInteger, rejectSameViewWriteConflicts, requireU32View, U32_BYTES, u32Bytes } from '../internal/common.mjs';
+import { binding, blockSize, closeResources, kernelByName, positiveSafeInteger, rejectViewWriteConflicts, requireU32View, U32_BYTES, u32Bytes } from '../internal/common.mjs';
 
 export const STABLE_SELECT_INDICES_U32_CONTRACT = 'CUDA-Algorithms-stable-select-indices-u32-candidate-v0';
 
@@ -76,7 +76,7 @@ export async function createStableSelectIndicesU32Plan(runtime, options = {}) {
     blockSize: threads,
     status: STABLE_SELECT_INDICES_U32_STATUS,
     workspace: Object.freeze({ prefixElements: inputCapacity, prefixBytes: inputBytes, controlU32Elements: 2 }),
-    aliasing: Object.freeze({ exactWriteConflictRejected: true, readReadSameViewAllowed: true, overlappingSiblingViews: 'requires CUDA-JS #260 before acceptance' }),
+    aliasing: Object.freeze({ writeRolesRequireDisjointRanges: true, overlappingReadOnlyRangesAllowed: true, relationOwner: 'cuda-js:inspectDeviceViewRelation' }),
     async submit(bindings) {
       if (closed) throw new Error('stable select plan is closed');
       const normalized = {
@@ -87,7 +87,7 @@ export async function createStableSelectIndicesU32Plan(runtime, options = {}) {
         outputCount: requireU32View(bindings?.outputCount, 1, 'outputCount', 'write'),
         status: requireU32View(bindings?.status, 1, 'status', 'read-write'),
       };
-      rejectSameViewWriteConflicts([
+      rejectViewWriteConflicts([
         { label: 'flags', view: normalized.flags, access: 'read' },
         { label: 'prefix', view: normalized.prefix, access: 'write' },
         { label: 'activeCount', view: normalized.activeCount, access: 'read' },
