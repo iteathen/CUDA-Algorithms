@@ -38,6 +38,9 @@ jobs:
       - name: Run reference semantics
         run: node --test reference/core-primitives.test.mjs reference/permutation-ordering.test.mjs reference/grouping-boundary.test.mjs
 
+      - name: Qualify maintained candidate API through public CUDA-JS mock
+        run: node --test test/candidate-api.test.mjs
+
       - name: Inspect Device-JS experiments
         run: |
           node experiments/first-gpu-slice/inspect.mjs
