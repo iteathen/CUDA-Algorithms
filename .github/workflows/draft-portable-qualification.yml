@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: iteathen/CUDA-JS
-          ref: e9837f20acf7901d445a1e7a2045459a1ae0118a
+          ref: 98e2ebc942c14d63acf4dd82e912dd548c363a05
           path: cuda-js
 
       - name: Use supported Node
