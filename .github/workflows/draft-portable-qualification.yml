@@ -36,7 +36,7 @@ jobs:
           ln -s ../cuda-js node_modules/cuda-js
 
       - name: Run reference semantics
-        run: node --test reference/core-primitives.test.mjs reference/permutation-ordering.test.mjs
+        run: node --test reference/core-primitives.test.mjs reference/permutation-ordering.test.mjs reference/grouping-boundary.test.mjs
 
       - name: Inspect Device-JS experiments
         run: |
