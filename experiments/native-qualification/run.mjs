@@ -3,15 +3,11 @@ import { openCudaRuntime } from 'cuda-js';
 import { scanUnsigned, selectIndices } from '../../reference/core-primitives.mjs';
 import { stableLexicographicOrderIndices } from '../../reference/permutation-ordering.mjs';
 import {
-  closePreparedStableSelect,
-  prepareStableSelectU32,
-} from '../first-gpu-slice/execution-plan.mjs';
-import { STATUS as SELECT_STATUS } from '../first-gpu-slice/device-program.mjs';
-import {
-  closePreparedTwoWordOrder,
-  prepareTwoWordStableOrderU32,
-} from '../stable-permutation-ordering/execution-plan.mjs';
-import { STATUS as ORDER_STATUS } from '../stable-permutation-ordering/device-program.mjs';
+  createStableLexicographicOrderIndicesU32Plan,
+  createStableSelectIndicesU32Plan,
+  STABLE_ORDER_INDICES_U32_STATUS as ORDER_STATUS,
+  STABLE_SELECT_INDICES_U32_STATUS as SELECT_STATUS,
+} from '../../src/index.mjs';
 
 const U32_BYTES = 4;
 
@@ -45,9 +41,7 @@ async function writeU32(allocation, values) {
 }
 
 async function readU32(allocation, count = allocation.count) {
-  if (!Number.isSafeInteger(count) || count < 0 || count > allocation.count) {
-    throw new RangeError('fixture read count is outside allocation');
-  }
+  if (!Number.isSafeInteger(count) || count < 0 || count > allocation.count) throw new RangeError('fixture read count is outside allocation');
   if (count === 0) return [];
   const result = await allocation.memory.read({ byteLength: count * U32_BYTES });
   return decodeU32(result.bytes);
@@ -61,7 +55,7 @@ async function closeAllocation(allocation) {
 async function runSelectFixture(runtime, fixture) {
   const inputCapacity = fixture.flags.length;
   const outputCapacity = fixture.outputCapacity ?? inputCapacity;
-  const slice = await prepareStableSelectU32(runtime, {
+  const plan = await createStableSelectIndicesU32Plan(runtime, {
     inputCapacity,
     outputCapacity,
     blockSize: Math.min(128, inputCapacity),
@@ -73,7 +67,7 @@ async function runSelectFixture(runtime, fixture) {
     const flags = await allocateU32(runtime, inputCapacity, 'read');
     const prefix = await allocateU32(runtime, inputCapacity, 'read-write');
     const activeCount = await allocateU32(runtime, 1, 'read');
-    const outputIndices = await allocateU32(runtime, outputCapacity, 'read-write');
+    const outputIndices = await allocateU32(runtime, outputCapacity, 'write');
     const outputCount = await allocateU32(runtime, 1, 'read-write');
     const status = await allocateU32(runtime, 1, 'read-write');
     allocations.push(flags, prefix, activeCount, outputIndices, outputCount, status);
@@ -85,15 +79,13 @@ async function runSelectFixture(runtime, fixture) {
     await writeU32(outputCount, [0]);
     await writeU32(status, [0]);
 
-    operation = await slice.prepared.submit({
-      bindings: {
-        flags: flags.view,
-        prefix: prefix.view,
-        activeCount: activeCount.view,
-        outputIndices: outputIndices.view,
-        outputCount: outputCount.view,
-        status: status.view,
-      },
+    operation = await plan.submit({
+      flags: flags.view,
+      prefix: prefix.view,
+      activeCount: activeCount.view,
+      outputIndices: outputIndices.view,
+      outputCount: outputCount.view,
+      status: status.view,
     });
     const terminal = await operation.wait();
     assert.equal(terminal.status, 'completed', `${fixture.name}: CUDA operation did not complete`);
@@ -112,65 +104,59 @@ async function runSelectFixture(runtime, fixture) {
       });
       const referenceSelection = selectIndices(fixture.flags.slice(0, active), { indexWidth: 32 });
       assert.equal(countValue, referenceSelection.outputCount, `${fixture.name}: output count`);
-      assert.deepEqual((await readU32(prefix, active)), referencePrefix, `${fixture.name}: prefix`);
-      assert.deepEqual(
-        (await readU32(outputIndices, Number(countValue))),
-        referenceSelection.indices,
-        `${fixture.name}: selected indices`,
-      );
+      assert.deepEqual(await readU32(prefix, active), referencePrefix, `${fixture.name}: prefix`);
+      assert.deepEqual(await readU32(outputIndices, Number(countValue)), referenceSelection.indices, `${fixture.name}: selected indices`);
     } else if (fixture.expectedStatus === SELECT_STATUS.OUTPUT_CAPACITY_EXHAUSTED) {
       const referenceSelection = selectIndices(fixture.flags.slice(0, Number(fixture.active)), { indexWidth: 32 });
       assert.equal(countValue, referenceSelection.outputCount, `${fixture.name}: required output count`);
     }
 
-    return {
-      name: fixture.name,
-      status: Number(statusValue),
-      outputCount: Number(countValue),
-    };
+    return { name: fixture.name, status: Number(statusValue), outputCount: Number(countValue) };
   } finally {
     if (operation) await operation.close();
     for (let i = allocations.length - 1; i >= 0; i -= 1) await closeAllocation(allocations[i]);
-    await closePreparedStableSelect(slice);
+    await plan.close();
   }
 }
 
 async function runOrderingFixture(runtime, fixture) {
-  const recordCapacity = fixture.highKeys.length;
+  const recordCapacity = fixture.keyWords[0].length;
+  if (!fixture.keyWords.every((word) => word.length === recordCapacity)) throw new RangeError(`${fixture.name}: key-word capacities differ`);
   const indexCapacity = fixture.indices.length;
-  const slice = await prepareTwoWordStableOrderU32(runtime, {
+  const plan = await createStableLexicographicOrderIndicesU32Plan(runtime, {
     recordCapacity,
     indexCapacity,
+    keyWordCount: fixture.keyWords.length,
     blockSize: Math.min(128, indexCapacity),
   });
   const allocations = [];
   let operation;
 
   try {
-    const lowKeys = await allocateU32(runtime, recordCapacity, 'read');
-    const highKeys = await allocateU32(runtime, recordCapacity, 'read');
+    const keyAllocations = [];
+    for (const word of fixture.keyWords) {
+      const allocation = await allocateU32(runtime, recordCapacity, 'read');
+      allocations.push(allocation);
+      keyAllocations.push(allocation);
+      await writeU32(allocation, word);
+    }
     const indicesA = await allocateU32(runtime, indexCapacity, 'read-write');
     const indicesB = await allocateU32(runtime, indexCapacity, 'read-write');
     const activeCount = await allocateU32(runtime, 1, 'read');
     const status = await allocateU32(runtime, 1, 'read-write');
-    allocations.push(lowKeys, highKeys, indicesA, indicesB, activeCount, status);
+    allocations.push(indicesA, indicesB, activeCount, status);
 
-    await writeU32(lowKeys, fixture.lowKeys);
-    await writeU32(highKeys, fixture.highKeys);
     await writeU32(indicesA, fixture.indices);
     await writeU32(indicesB, new Array(indexCapacity).fill(0));
     await writeU32(activeCount, [fixture.active]);
     await writeU32(status, [0]);
 
-    operation = await slice.prepared.submit({
-      bindings: {
-        lowKeys: lowKeys.view,
-        highKeys: highKeys.view,
-        indicesA: indicesA.view,
-        indicesB: indicesB.view,
-        activeCount: activeCount.view,
-        status: status.view,
-      },
+    operation = await plan.submit({
+      keyWords: keyAllocations.map((allocation) => allocation.view),
+      indicesA: indicesA.view,
+      indicesB: indicesB.view,
+      activeCount: activeCount.view,
+      status: status.view,
     });
     const terminal = await operation.wait();
     assert.equal(terminal.status, 'completed', `${fixture.name}: CUDA operation did not complete`);
@@ -182,18 +168,19 @@ async function runOrderingFixture(runtime, fixture) {
       const active = Number(fixture.active);
       const inputOrder = fixture.indices.slice(0, active).map(BigInt);
       const expected = stableLexicographicOrderIndices(
-        [fixture.highKeys.map(BigInt), fixture.lowKeys.map(BigInt)],
+        fixture.keyWords.map((word) => word.map(BigInt)),
         inputOrder,
         { wordWidth: 32, indexWidth: 32 },
       );
-      assert.deepEqual((await readU32(indicesA, active)), expected, `${fixture.name}: final ordered indices`);
+      const resultAllocation = plan.resultBinding === 'indicesA' ? indicesA : indicesB;
+      assert.deepEqual(await readU32(resultAllocation, active), expected, `${fixture.name}: final ordered indices`);
     }
 
-    return { name: fixture.name, status: Number(statusValue) };
+    return { name: fixture.name, status: Number(statusValue), keyWordCount: fixture.keyWords.length, resultBinding: plan.resultBinding };
   } finally {
     if (operation) await operation.close();
     for (let i = allocations.length - 1; i >= 0; i -= 1) await closeAllocation(allocations[i]);
-    await closePreparedTwoWordOrder(slice);
+    await plan.close();
   }
 }
 
@@ -209,40 +196,42 @@ const selectFixtures = [
 const orderingFixtures = [
   {
     name: 'order-two-word-stable',
-    highKeys: [2, 1, 2, 1, 2, 1],
-    lowKeys: [5, 1, 4, 7, 4, 6],
+    keyWords: [[2, 1, 2, 1, 2, 1], [5, 1, 4, 7, 4, 6]],
     indices: [2, 5, 0, 4, 1, 3],
     active: 6,
     expectedStatus: ORDER_STATUS.OK,
   },
   {
+    name: 'order-three-word-stable',
+    keyWords: [[1, 0, 1, 0, 1, 0], [2, 2, 1, 1, 2, 1], [9, 3, 4, 5, 4, 5]],
+    indices: [5, 2, 0, 4, 1, 3],
+    active: 6,
+    expectedStatus: ORDER_STATUS.OK,
+  },
+  {
     name: 'order-active-prefix',
-    highKeys: [1, 1, 0, 2, 9, 9],
-    lowKeys: [3, 3, 7, 1, 0, 0],
+    keyWords: [[1, 1, 0, 2, 9, 9], [3, 3, 7, 1, 0, 0]],
     indices: [3, 0, 2, 1, 5, 4],
     active: 4,
     expectedStatus: ORDER_STATUS.OK,
   },
   {
     name: 'order-duplicate-index-values',
-    highKeys: [1, 0, 1, 0],
-    lowKeys: [2, 9, 2, 1],
+    keyWords: [[1, 0, 1, 0], [2, 9, 2, 1]],
     indices: [2, 2, 3, 1],
     active: 4,
     expectedStatus: ORDER_STATUS.OK,
   },
   {
     name: 'order-empty-active',
-    highKeys: [1, 0, 1, 0],
-    lowKeys: [2, 9, 2, 1],
+    keyWords: [[1, 0, 1, 0], [2, 9, 2, 1]],
     indices: [3, 2, 1, 0],
     active: 0,
     expectedStatus: ORDER_STATUS.OK,
   },
   {
     name: 'order-invalid-index',
-    highKeys: [1, 0, 1, 0],
-    lowKeys: [2, 9, 2, 1],
+    keyWords: [[1, 0, 1, 0], [2, 9, 2, 1]],
     indices: [0, 4, 1, 2],
     active: 4,
     expectedStatus: ORDER_STATUS.INVALID_INDEX,
@@ -250,18 +239,18 @@ const orderingFixtures = [
 ];
 
 let runtime;
-const results = { schemaVersion: 1, kind: 'cuda-algorithms-native-first-profile-qualification', select: [], ordering: [] };
+const results = {
+  schemaVersion: 1,
+  kind: 'cuda-algorithms-native-first-profile-qualification',
+  maintainedSurface: true,
+  select: [],
+  ordering: [],
+};
 
 try {
   runtime = await openCudaRuntime({ compiler: true });
-
-  for (const fixture of selectFixtures) {
-    results.select.push(await runSelectFixture(runtime, fixture));
-  }
-  for (const fixture of orderingFixtures) {
-    results.ordering.push(await runOrderingFixture(runtime, fixture));
-  }
-
+  for (const fixture of selectFixtures) results.select.push(await runSelectFixture(runtime, fixture));
+  for (const fixture of orderingFixtures) results.ordering.push(await runOrderingFixture(runtime, fixture));
   results.outcome = 'pass';
   console.log(JSON.stringify(results, null, 2));
 } catch (error) {
