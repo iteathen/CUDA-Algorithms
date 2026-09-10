@@ -20,11 +20,13 @@ CUDA-Algorithms owns:
 - logical input/output/workspace/control roles;
 - host-known capacities and device-resident active-extent meaning;
 - algorithm semantic status and deterministic/stability requirements;
-- algorithm-specific workspace and realization bounds.
+- algorithm-specific workspace and realization bounds;
+- algorithm-specific alias policy.
 
 CUDA-JS owns:
 
 - allocations, device views and their private parent/range truth;
+- the consumer-neutral public byte-range relation between live same-runtime views;
 - Device-JS parsing/lowering/compilation/linking;
 - modules/functions, prepared execution and operation lifecycle;
 - native providers, streams/events, transfers, memory ordering and cleanup.
@@ -122,18 +124,32 @@ Whole-plan access truth must be stated honestly. A workspace written in one stag
 
 ## Aliasing boundary
 
-Algorithm alias policy belongs to CUDA-Algorithms; underlying allocation/view relation truth belongs to CUDA-JS.
+Algorithm alias policy belongs to CUDA-Algorithms. Allocation/view byte-range truth belongs to CUDA-JS.
 
-The maintained candidate can currently prove and enforce:
+CUDA-JS `cuda-js@0.1.0-alpha.20` exposes the consumer-neutral public relation:
 
-- exact same public view object + at least one writing role => reject before algorithm submission;
-- exact same public view object used only by read roles => allowed when the family permits it.
+```text
+inspectDeviceViewRelation(a, b)
+  -> "same-range" | "overlap" | "disjoint"
+```
 
-Current public CUDA-JS views intentionally hide parent allocation identity. Therefore two distinct sibling views cannot yet be classified by CUDA-Algorithms as disjoint/overlapping/contained.
+The relation uses private lower parent/range truth, exposes no allocation/native identity and performs no native/actor work. Invalid/incomparable capabilities fail closed in the lower owner.
 
-The missing consumer-neutral relation is tracked by `iteathen/CUDA-JS#260`. Until that or an equivalent lower capability is accepted and consumed, the first CUDA-Algorithms candidate must **not** claim full detection of overlapping sibling-view aliases.
+The first CUDA-Algorithms Candidate policy is:
 
-CUDA-Algorithms must not build a private parent-token registry, deep-import CUDA-JS internals, or expose native addresses to work around this boundary.
+```text
+read + read:
+  same-range / overlap / disjoint are allowed when the family permits reuse
+
+any pair where at least one role writes:
+  relation must be disjoint
+```
+
+`same-range` or `overlap` with a writing role rejects before prepared algorithm submission.
+
+This policy covers exact same-object aliases, same-range sibling views, containment and partial overlap without CUDA-Algorithms knowing or exposing parent allocation identity.
+
+CUDA-Algorithms must not build a private parent-token registry, deep-import CUDA-JS internals, or expose native addresses to implement alias policy.
 
 ## Bounded resources and realization limits
 
@@ -153,18 +169,20 @@ Floating-point reduction/reassociation policy is outside this Candidate.
 
 ## Evidence supporting Candidate status
 
-The common contract has now been exercised by two maintained algorithm families and mapped to materially different consumers (BSFP-style record/index processing, CUDA-DATA-style row/column processing, and graph/frontier processing).
+The common contract has been exercised by two maintained algorithm families and mapped to materially different consumers (BSFP-style record/index processing, CUDA-DATA-style row/column processing, and graph/frontier processing).
 
-Portable evidence against CUDA-JS `e9837f20acf7901d445a1e7a2045459a1ae0118a` / Node `v26.7.0` includes:
+Portable evidence against CUDA-JS `98e2ebc942c14d63acf4dd82e912dd548c363a05` / `cuda-js@0.1.0-alpha.20` / Node `v26.7.0` includes:
 
 - 23/23 deterministic reference tests;
-- 5/5 maintained candidate API tests;
+- 6/6 maintained Candidate API tests;
 - accepted Device-JS inspection for the current status/ordering kernels;
 - public CUDA-JS prepared-DAG composition;
-- explicit exact-view write-conflict and legal read/read alias tests;
+- same-range write-conflict rejection;
+- partial sibling-view overlap rejection through `inspectDeviceViewRelation`;
+- legal read/read reuse;
 - physical qualification harness syntax validation.
 
-The alias falsifier and ownership disposition are recorded in `docs/evidence/2026-09-09-device-view-alias-boundary.md`.
+The historical falsifier, ownership routing and #260 resolution are recorded in `docs/evidence/2026-09-09-device-view-alias-boundary.md`.
 
 This is **not** native CUDA-Algorithms result evidence.
 
@@ -172,11 +190,10 @@ This is **not** native CUDA-Algorithms result evidence.
 
 Before this specification becomes Accepted:
 
-1. run the maintained physical qualification harness on an exact directly accessible CUDA profile;
+1. run the maintained physical qualification harness on an exact directly accessible CUDA profile using the exact CUDA-JS revision under test;
 2. compare produced results against the independent reference semantics;
 3. prove operation/plan/runtime cleanup on the same run;
-4. resolve or explicitly narrow the distinct-sibling-view alias contract using CUDA-JS #260 or equivalent evidence;
-5. review the resulting public surface and realization bounds at an exact revision.
+4. review the resulting public surface, alias policy and realization bounds at the exact tested revision.
 
 Performance is separately gated. A correctness pass does not justify throughput claims.
 
