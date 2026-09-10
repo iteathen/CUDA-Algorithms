@@ -17,6 +17,14 @@ async function closeAllocation(allocation) {
   await allocation.memory.close();
 }
 
+async function closeAll(runtime, plan, operation, allocations) {
+  if (operation) await operation.close();
+  if (plan) await plan.close();
+  for (let i = allocations.length - 1; i >= 0; i -= 1) await closeAllocation(allocations[i]);
+  const closed = await runtime.close();
+  assert.equal(closed.graceful, true);
+}
+
 test('candidate stable-select plan submits one nonblocking CUDA-JS operation', async () => {
   const runtime = await openCudaRuntimeForTesting({ compiler: true });
   const allocations = [];
@@ -36,24 +44,40 @@ test('candidate stable-select plan submits one nonblocking CUDA-JS operation', a
     const status = await allocateU32(runtime, 1, 'read-write');
     allocations.push(flags, prefix, activeCount, outputIndices, outputCount, status);
 
-    operation = await plan.submit({
-      flags: flags.view,
-      prefix: prefix.view,
-      activeCount: activeCount.view,
-      outputIndices: outputIndices.view,
-      outputCount: outputCount.view,
-      status: status.view,
-    });
+    operation = await plan.submit({ flags: flags.view, prefix: prefix.view, activeCount: activeCount.view, outputIndices: outputIndices.view, outputCount: outputCount.view, status: status.view });
     assert.equal(operation.kind, 'operation');
     const terminal = await operation.wait();
     assert.equal(terminal.status, 'completed');
     assert.equal(terminal.kind, 'prepared-batch');
   } finally {
-    if (operation) await operation.close();
-    if (plan) await plan.close();
-    for (let i = allocations.length - 1; i >= 0; i -= 1) await closeAllocation(allocations[i]);
-    const closed = await runtime.close();
-    assert.equal(closed.graceful, true);
+    await closeAll(runtime, plan, operation, allocations);
+  }
+});
+
+test('candidate stable-select rejects exact-view write conflicts but permits read-read reuse', async () => {
+  const runtime = await openCudaRuntimeForTesting({ compiler: true });
+  const allocations = [];
+  let plan;
+  let operation;
+  try {
+    plan = await createStableSelectIndicesU32Plan(runtime, { inputCapacity: 8, outputCapacity: 8, blockSize: 8 });
+    const sharedReadWrite = await allocateU32(runtime, 8, 'read-write');
+    const sharedRead = await allocateU32(runtime, 8, 'read');
+    const prefix = await allocateU32(runtime, 8, 'read-write');
+    const outputIndices = await allocateU32(runtime, 8, 'write');
+    const outputCount = await allocateU32(runtime, 1, 'read-write');
+    const status = await allocateU32(runtime, 1, 'read-write');
+    allocations.push(sharedReadWrite, sharedRead, prefix, outputIndices, outputCount, status);
+
+    await assert.rejects(
+      () => plan.submit({ flags: sharedReadWrite.view, prefix: sharedReadWrite.view, activeCount: sharedRead.view, outputIndices: outputIndices.view, outputCount: outputCount.view, status: status.view }),
+      /must not use the same CUDA-JS device view when either role writes/,
+    );
+
+    operation = await plan.submit({ flags: sharedRead.view, prefix: prefix.view, activeCount: sharedRead.view, outputIndices: outputIndices.view, outputCount: outputCount.view, status: status.view });
+    assert.equal((await operation.wait()).status, 'completed');
+  } finally {
+    await closeAll(runtime, plan, operation, allocations);
   }
 });
 
@@ -63,12 +87,7 @@ test('candidate lexicographic ordering plan composes arbitrary bounded key-word 
   let plan;
   let operation;
   try {
-    plan = await createStableLexicographicOrderIndicesU32Plan(runtime, {
-      recordCapacity: 16,
-      indexCapacity: 16,
-      keyWordCount: 3,
-      blockSize: 8,
-    });
+    plan = await createStableLexicographicOrderIndicesU32Plan(runtime, { recordCapacity: 16, indexCapacity: 16, keyWordCount: 3, blockSize: 8 });
     assert.equal(plan.family, 'stable-lexicographic-order-indices');
     assert.equal(plan.resultBinding, 'indicesB');
     assert.equal(plan.realizationBounds.maxKeyWordCount, 31);
@@ -85,22 +104,43 @@ test('candidate lexicographic ordering plan composes arbitrary bounded key-word 
     const status = await allocateU32(runtime, 1, 'read-write');
     allocations.push(indicesA, indicesB, activeCount, status);
 
-    operation = await plan.submit({
-      keyWords,
-      indicesA: indicesA.view,
-      indicesB: indicesB.view,
-      activeCount: activeCount.view,
-      status: status.view,
-    });
+    operation = await plan.submit({ keyWords, indicesA: indicesA.view, indicesB: indicesB.view, activeCount: activeCount.view, status: status.view });
     const terminal = await operation.wait();
     assert.equal(terminal.status, 'completed');
     assert.equal(terminal.nodeCount, 4);
   } finally {
-    if (operation) await operation.close();
-    if (plan) await plan.close();
-    for (let i = allocations.length - 1; i >= 0; i -= 1) await closeAllocation(allocations[i]);
-    const closed = await runtime.close();
-    assert.equal(closed.graceful, true);
+    await closeAll(runtime, plan, operation, allocations);
+  }
+});
+
+test('candidate ordering rejects exact-view write conflicts but permits duplicate read-only key views', async () => {
+  const runtime = await openCudaRuntimeForTesting({ compiler: true });
+  const allocations = [];
+  let plan;
+  let operation;
+  try {
+    plan = await createStableLexicographicOrderIndicesU32Plan(runtime, { recordCapacity: 8, indexCapacity: 8, keyWordCount: 2, blockSize: 8 });
+    const sharedReadWrite = await allocateU32(runtime, 8, 'read-write');
+    const key = await allocateU32(runtime, 8, 'read');
+    const indicesA = await allocateU32(runtime, 8, 'read-write');
+    const indicesB = await allocateU32(runtime, 8, 'read-write');
+    const activeCount = await allocateU32(runtime, 1, 'read');
+    const status = await allocateU32(runtime, 1, 'read-write');
+    allocations.push(sharedReadWrite, key, indicesA, indicesB, activeCount, status);
+
+    await assert.rejects(
+      () => plan.submit({ keyWords: [sharedReadWrite.view, key.view], indicesA: sharedReadWrite.view, indicesB: indicesB.view, activeCount: activeCount.view, status: status.view }),
+      /must not use the same CUDA-JS device view when either role writes/,
+    );
+    await assert.rejects(
+      () => plan.submit({ keyWords: [key.view, key.view], indicesA: indicesA.view, indicesB: indicesA.view, activeCount: activeCount.view, status: status.view }),
+      /must not use the same CUDA-JS device view when either role writes/,
+    );
+
+    operation = await plan.submit({ keyWords: [key.view, key.view], indicesA: indicesA.view, indicesB: indicesB.view, activeCount: activeCount.view, status: status.view });
+    assert.equal((await operation.wait()).status, 'completed');
+  } finally {
+    await closeAll(runtime, plan, operation, allocations);
   }
 });
 
