@@ -1,6 +1,6 @@
 import { compileDeviceProgram } from 'cuda-js';
 import { stableOrderIndicesU32DeviceProgram, STABLE_ORDER_INDICES_U32_STATUS } from '../device/stable-order-indices-u32-program.mjs';
-import { binding, blockSize, closeResources, kernelByName, positiveSafeInteger, PREPARED_KERNEL_NODE_CEILING, rejectSameViewWriteConflicts, requireU32View, U32_BYTES, u32Bytes } from '../internal/common.mjs';
+import { binding, blockSize, closeResources, kernelByName, positiveSafeInteger, PREPARED_KERNEL_NODE_CEILING, rejectViewWriteConflicts, requireU32View, U32_BYTES, u32Bytes } from '../internal/common.mjs';
 
 export const STABLE_LEXICOGRAPHIC_ORDER_INDICES_U32_CONTRACT = 'CUDA-Algorithms-stable-lexicographic-order-indices-u32-candidate-v0';
 
@@ -80,7 +80,7 @@ export async function createStableLexicographicOrderIndicesU32Plan(runtime, opti
     resultBinding,
     status: STABLE_ORDER_INDICES_U32_STATUS,
     realizationBounds: Object.freeze({ maxKeyWordCount: PREPARED_KERNEL_NODE_CEILING - 1, reason: 'current CUDA-JS prepared kernel DAG node ceiling' }),
-    aliasing: Object.freeze({ exactWriteConflictRejected: true, readReadSameViewAllowed: true, overlappingSiblingViews: 'requires CUDA-JS #260 before acceptance' }),
+    aliasing: Object.freeze({ writeRolesRequireDisjointRanges: true, overlappingReadOnlyRangesAllowed: true, relationOwner: 'cuda-js:inspectDeviceViewRelation' }),
     async submit(bindings) {
       if (closed) throw new Error('stable ordering plan is closed');
       if (!Array.isArray(bindings?.keyWords) || bindings.keyWords.length !== keyWordCount) {
@@ -103,7 +103,7 @@ export async function createStableLexicographicOrderIndicesU32Plan(runtime, opti
         { label: 'activeCount', view: normalized.activeCount, access: 'read' },
         { label: 'status', view: normalized.status, access: 'write' },
       );
-      rejectSameViewWriteConflicts(roles);
+      rejectViewWriteConflicts(roles);
       return prepared.submit({ bindings: normalized });
     },
     async close() {
