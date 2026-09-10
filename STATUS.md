@@ -2,81 +2,104 @@
 
 **Updated:** 2026-09-09
 
-**Architecture/ownership:** accepted independent reusable GPU parallel-algorithm semantic owner under ADR-0001 and SPEC-0001.
-**Production implementation/API:** not yet authorized; issue #3 activation design is in progress.
-**Provider/support:** none selected or claimed.
+**Architecture/ownership:** Accepted under ADR-0001 and SPEC-0001.
+**First maintained algorithm surface:** Candidate; implemented on `design/first-algorithm-profile`.
+**Native CUDA-Algorithms result qualification:** not yet run.
+**Performance support/claims:** none.
 
 ## Current work
 
-- #1 ownership/bootstrap authority — completed through PR #4.
-- #2 repository-control/protected-main alignment — partially complete. `main` is protected; remaining repository-setting/code-owner parity debt is administrative and does **not** block issue #3 design/reference work.
-- #3 first consumer-backed algorithm profile — **active** on `design/first-algorithm-profile`.
+- #1 ownership/bootstrap — completed.
+- #2 repository controls — `main` protected; remaining admin parity tracked separately and does not block algorithm work.
+- #3 first consumer-backed algorithm profile — active.
 
-## Issue #3 activation state
+Protected `main` currently includes PR #6 read-only CI/document verification. The feature branch merged that protected-main baseline before continued development.
 
-The first working design intentionally separates three LEGOs:
+## Candidate specifications
 
-1. common algorithm-plan, active-extent and device-chaining semantics;
-2. reusable sequence/keyed primitives;
-3. GPU-owned workset/fixed-point closure.
+- **SPEC-0002 — Algorithm Plans, Active Extents, and Device Chaining:** Candidate.
+- **SPEC-0003 — Stable Index Selection and Permutation Ordering:** Candidate.
+- **SPEC-0004 — Device Worksets and Fixed-Point Closure:** Working Draft.
 
-Current Working Draft specifications:
+Candidate is not Accepted compatibility/support authority. Breaking corrections remain allowed before acceptance when qualification exposes a better complete design.
 
-- SPEC-0002 — Algorithm Plans, Active Extents, and Device Chaining;
-- SPEC-0003 — Core Sequence and Keyed GPU Primitives;
-- SPEC-0004 — Device Worksets and Fixed-Point Closure.
+## Maintained candidate implementation
 
-These drafts are **not compatibility authority**. During the first implementation cycle, exact names, type coverage, status layout, workspace shape and even spec decomposition may change when evidence shows a better design. Prototype evidence must record the exact draft revision it tested.
-
-## Selected first primitive spine
-
-Current candidate set:
+Package identity in development:
 
 ```text
-scan
-reduce
-stable select-indices by flag
-gather by index
-stable radix sort keys / key-index pairs
-run-length encode
-reduce-by-key
+cuda-algorithms@0.1.0-alpha.0
+peer: cuda-js@0.1.0-alpha.19
 ```
 
-The design uses index indirection before inventing a generic record ABI. Stable radix ordering is normative so wider consumer-owned keys can be composed from repeated stable primitive-word passes.
+Maintained public candidate surface:
 
-## Device-owned progression target
+```text
+createStableSelectIndicesU32Plan(...)
+createStableLexicographicOrderIndicesU32Plan(...)
+```
 
-A device-resident active count plus explicit capacity should let one GPU stage feed another without Node reading counts between stages.
+Both plans:
 
-For GPU-owned closure profiles, Node may administer allocations, submission, persistence/checkpoints and asynchronous status observation, but it must not perform mathematical frontier selection, grouping, deduplication, predecessor decisions or fixed-point advancement on the CPU.
+- use public CUDA-JS only;
+- operate over public `u32` device views;
+- use device-resident active counts;
+- return the ordinary CUDA-JS operation from `submit()`;
+- do not call `wait()` or read results inside the production API;
+- own bounded plan-resource cleanup without creating a second native-operation lifecycle.
 
-Ranked acyclic closure is the preferred first closure slice. General cyclic/monotone workset closure may remain draft longer if its callback/composition boundary is not yet stable.
+Stable lexicographic ordering keeps consumer records in place and reorders an index sequence by external key-word columns. The current prepared-DAG realization supports at most 31 key words because CUDA-JS currently admits 32 prepared kernel nodes; this is a realization limit, not an algorithmic key-width limit.
 
-## CUDA-JS capability assessment
+## Current portable evidence
 
-Accepted CUDA-JS already supplies restricted Device-JS, typed contiguous views, atomics, block barrier/device fence, bounded multi-operation execution, async transfers, prepared kernel DAG semantics and typed Device-JS library composition.
+Exact portable candidate evidence uses:
 
-The broader trusted Device-JS parallel proposal still leaves fixed local arrays, typed shared memory and warp primitives demand-driven/proposal-only. Correctness-first CUDA-Algorithms implementations should use current accepted capabilities first. Only the minimum generic lower mechanism demonstrated necessary by implementation/performance evidence should be routed to CUDA-JS.
+```text
+CUDA-JS: e9837f20acf7901d445a1e7a2045459a1ae0118a
+Node:    v26.7.0
+```
 
-CUDA-JS #223 separately owns cooperative-launch/grid-sync assessment and is not a prerequisite for the first correctness path.
+Latest complete green boundary includes:
+
+- 23/23 independent/reference tests;
+- 5/5 maintained candidate API tests;
+- Device-JS inspection of correctness kernels;
+- public prepared-DAG composition;
+- exact-view write-conflict rejection and legal read/read reuse;
+- physical qualification harness syntax validation.
+
+Current correctness kernels require only accepted Device-JS facilities (`globalX`, CAS and relaxed device-scope atomic status observation). Shared memory/warp/local-array widening is not required for correctness and remains performance-driven.
+
+## CUDA-JS physical substrate
+
+CUDA-JS current revision `e9837f20acf7901d445a1e7a2045459a1ae0118a` records its Windows gate-32 compatible pair as passed, reviewed and owner-approved on the exact recorded Windows x64 / GTX 1660 Ti / driver 610.74 / CUDA 13.3 / Node 26.7.0 profile.
+
+That establishes a physically available lower substrate for the recorded host profile. It does **not** automatically qualify CUDA-Algorithms numerical/semantic results.
+
+`experiments/native-qualification/run.mjs` now exercises the maintained candidate API, including valid/error stable selection and two-/three-word stable ordering against independent references. The CUDA-Algorithms physical run remains outstanding.
+
+## Alias ownership boundary
+
+A cleanup-safe falsifier proved that current CUDA-JS prepared submission does not enforce an upper algorithm's intra-node same-view non-alias rule. That behavior is compatible with the lower prepared-DAG ownership boundary.
+
+CUDA-Algorithms now rejects exact same-view conflicts whenever either role writes and permits pure read/read reuse.
+
+Different sibling views can still overlap one underlying allocation without enough public information for CUDA-Algorithms to classify them. The consumer-neutral lower relation is tracked by **CUDA-JS #260**. Until it exists or the Candidate is explicitly narrowed, CUDA-Algorithms must not claim full overlapping-sibling-view detection.
+
+Evidence: `docs/evidence/2026-09-09-device-view-alias-boundary.md`.
 
 ## Next executable work
 
-1. Add deterministic JavaScript reference semantics for the first primitive subset.
-2. Add property/edge fixtures for stability, width, capacity, active extent and multiword stable-sort composition.
-3. Build the smallest exact GPU vertical slice through public CUDA-JS without CPU semantic work.
-4. Record the first concrete lower CUDA-JS capability gap rather than assuming the whole SPEC-0022 parallel family is required.
-5. Revise Working Drafts immediately when the implementation exposes a better abstraction.
-6. Promote only the stable subset to Candidate, then Accepted after exact qualification.
+1. Build the first **ranked-closure** reference/vertical slice under Working Draft SPEC-0004.
+2. Keep derivation/equality/domain semantics with consumers; identify only the generic workset/epoch algebra that survives consumer deletion.
+3. Preserve device-resident progression and bounded administrative yields; no Node semantic loop.
+4. Run the maintained candidate native harness on the qualified Windows CUDA-JS substrate when that host execution path is available to the acting agent/operator.
+5. After native correctness, measure the O(n²) correctness kernels before requesting shared-memory/warp CUDA-JS widening.
 
-## Protected-main readback
+## Claim limits
 
-`main` is protected by active default-branch integrity and PR-review rulesets. Remaining #2 parity debt is tracked separately and must not be confused with algorithm implementation readiness.
-
-No required status-check name is fabricated because CUDA-Algorithms has no local CI workflow yet.
-
-## Ecosystem boundaries
-
-CUDA-JS owns generic Device-JS/compiler/runtime/memory/provider/lifecycle mechanisms. CUDA-JS-Tensor owns Tensor mathematics. CUDA-DATA owns tables/columns/dataframes. CUDA-GRAPH-ANALYTICS owns graph-analysis meaning. CUDA-MM owns generic physical placement/spill policy if activated. CUDA-MCGS and downstream solvers retain search/proof/domain semantics.
-
-No Working Draft, prototype, provider availability or first-consumer success is production support/performance authority.
+- Portable/mock/frontend evidence is not native CUDA-Algorithms evidence.
+- CUDA-JS hardware qualification does not transfer automatically to upper algorithm results.
+- Correctness-first kernels make no performance claim.
+- Candidate specs are not Accepted compatibility authority.
+- No BSFP, dataframe, graph or other consumer semantics belong in CUDA-Algorithms.
