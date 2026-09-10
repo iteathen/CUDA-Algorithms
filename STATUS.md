@@ -13,7 +13,7 @@
 - #2 repository controls — `main` protected; remaining admin parity tracked separately and does not block algorithm work.
 - #3 first consumer-backed algorithm profile — active.
 
-Protected `main` currently includes PR #6 read-only CI/document verification. The feature branch merged that protected-main baseline before continued development.
+Protected `main` includes PR #6 read-only CI/document verification. The feature branch merged that protected-main baseline before continued development.
 
 ## Candidate specifications
 
@@ -23,16 +23,16 @@ Protected `main` currently includes PR #6 read-only CI/document verification. Th
 
 Candidate is not Accepted compatibility/support authority. Breaking corrections remain allowed before acceptance when qualification exposes a better complete design.
 
-## Maintained candidate implementation
+## Maintained Candidate implementation
 
-Package identity in development:
+Development package identity:
 
 ```text
 cuda-algorithms@0.1.0-alpha.0
-peer: cuda-js@0.1.0-alpha.19
+peer: cuda-js@0.1.0-alpha.20
 ```
 
-Maintained public candidate surface:
+Maintained public Candidate surface:
 
 ```text
 createStableSelectIndicesU32Plan(...)
@@ -52,39 +52,53 @@ Stable lexicographic ordering keeps consumer records in place and reorders an in
 
 ## Current portable evidence
 
-Exact portable candidate evidence uses:
+Exact portable Candidate evidence uses:
 
 ```text
-CUDA-JS: e9837f20acf7901d445a1e7a2045459a1ae0118a
+CUDA-JS: 98e2ebc942c14d63acf4dd82e912dd548c363a05
+package: cuda-js@0.1.0-alpha.20
 Node:    v26.7.0
 ```
 
 Latest complete green boundary includes:
 
 - 23/23 independent/reference tests;
-- 5/5 maintained candidate API tests;
+- 6/6 maintained Candidate API tests;
 - Device-JS inspection of correctness kernels;
 - public prepared-DAG composition;
-- exact-view write-conflict rejection and legal read/read reuse;
+- same-range write-conflict rejection;
+- partially overlapping sibling-view rejection through public CUDA-JS range truth;
+- legal read/read reuse;
 - physical qualification harness syntax validation.
 
 Current correctness kernels require only accepted Device-JS facilities (`globalX`, CAS and relaxed device-scope atomic status observation). Shared memory/warp/local-array widening is not required for correctness and remains performance-driven.
 
 ## CUDA-JS physical substrate
 
-CUDA-JS current revision `e9837f20acf7901d445a1e7a2045459a1ae0118a` records its Windows gate-32 compatible pair as passed, reviewed and owner-approved on the exact recorded Windows x64 / GTX 1660 Ti / driver 610.74 / CUDA 13.3 / Node 26.7.0 profile.
+CUDA-JS gate-32 physical evidence was recorded on the exact alpha.19 Windows x64 / GTX 1660 Ti / driver 610.74 / CUDA 13.3 / Node 26.7.0 compatible pair and remains valid for that recorded pair.
 
-That establishes a physically available lower substrate for the recorded host profile. It does **not** automatically qualify CUDA-Algorithms numerical/semantic results.
+CUDA-JS main then added the pure public view-range relation in alpha.20 at `98e2ebc942c14d63acf4dd82e912dd548c363a05`. The relation itself performs no actor/native work and keeps allocation/native identity private.
 
-`experiments/native-qualification/run.mjs` now exercises the maintained candidate API, including valid/error stable selection and two-/three-word stable ordering against independent references. The CUDA-Algorithms physical run remains outstanding.
+That gives CUDA-Algorithms the lower relation required for full write-range alias admission policy. It does **not** automatically qualify CUDA-Algorithms numerical/semantic results or silently transfer the earlier package-level native claim to alpha.20.
 
-## Alias ownership boundary
+`experiments/native-qualification/run.mjs` exercises the maintained Candidate API, including valid/error stable selection and two-/three-word stable ordering against independent references. The CUDA-Algorithms physical run remains outstanding and must record the exact alpha.20 revision actually exercised.
 
-A cleanup-safe falsifier proved that current CUDA-JS prepared submission does not enforce an upper algorithm's intra-node same-view non-alias rule. That behavior is compatible with the lower prepared-DAG ownership boundary.
+## Alias ownership boundary — resolved at public-contract level
 
-CUDA-Algorithms now rejects exact same-view conflicts whenever either role writes and permits pure read/read reuse.
+Historical falsification showed that prepared-DAG hazards do not own an upper algorithm's intra-node alias policy. CUDA-JS #260 therefore added the correct lower LEGO stud:
 
-Different sibling views can still overlap one underlying allocation without enough public information for CUDA-Algorithms to classify them. The consumer-neutral lower relation is tracked by **CUDA-JS #260**. Until it exists or the Candidate is explicitly narrowed, CUDA-Algorithms must not claim full overlapping-sibling-view detection.
+```text
+inspectDeviceViewRelation(a, b)
+  -> same-range | overlap | disjoint
+```
+
+CUDA-Algorithms now owns the policy over that lower fact:
+
+- read/read ranges may overlap where the algorithm permits reuse;
+- any pair involving a write must be `disjoint`;
+- `same-range` or `overlap` rejects before prepared algorithm submission.
+
+This now covers distinct sibling views without exposing their parent allocation identity.
 
 Evidence: `docs/evidence/2026-09-09-device-view-alias-boundary.md`.
 
@@ -93,13 +107,13 @@ Evidence: `docs/evidence/2026-09-09-device-view-alias-boundary.md`.
 1. Build the first **ranked-closure** reference/vertical slice under Working Draft SPEC-0004.
 2. Keep derivation/equality/domain semantics with consumers; identify only the generic workset/epoch algebra that survives consumer deletion.
 3. Preserve device-resident progression and bounded administrative yields; no Node semantic loop.
-4. Run the maintained candidate native harness on the qualified Windows CUDA-JS substrate when that host execution path is available to the acting agent/operator.
+4. Run the maintained Candidate native harness on the available Windows CUDA-JS host when direct host execution is available to the acting agent/operator.
 5. After native correctness, measure the O(n²) correctness kernels before requesting shared-memory/warp CUDA-JS widening.
 
 ## Claim limits
 
 - Portable/mock/frontend evidence is not native CUDA-Algorithms evidence.
-- CUDA-JS hardware qualification does not transfer automatically to upper algorithm results.
+- CUDA-JS hardware qualification does not transfer automatically to upper algorithm results or later package revisions.
 - Correctness-first kernels make no performance claim.
 - Candidate specs are not Accepted compatibility authority.
 - No BSFP, dataframe, graph or other consumer semantics belong in CUDA-Algorithms.
