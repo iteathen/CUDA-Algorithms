@@ -7,7 +7,7 @@
 
 Can the first CUDA-Algorithms sequence pipeline consume a **device-resident active count** and advance from scan to stable selection without Node reading the count or performing a semantic step between GPU stages?
 
-This experiment deliberately prioritizes correctness and boundary discovery over performance.
+Current portable answer: **yes at the CUDA-JS frontend/orchestration boundary**. Native GPU execution remains unproved.
 
 ## Shape
 
@@ -45,38 +45,77 @@ Important behavior:
 - selected indices are stable in ascending source order;
 - no D2H active-count read is required between scan and select.
 
-## What this can prove
+## Portable qualification
 
-If accepted by the real CUDA-JS Device-JS frontend and then executed successfully on a qualified GPU path, the experiment can support these narrow claims:
-
-- current public Device-JS is expressive enough for a correctness-first device-count-driven scan/select chain;
-- device-resident active extents do not inherently require a host semantic advancement loop;
-- the draft common-plan/device-chaining concept can proceed without first widening CUDA-JS with shared memory or warp operations.
-
-It cannot prove:
-
-- useful scan/select performance;
-- production CUDA-Algorithms API shape;
-- that shared memory, local arrays, warp operations or another lower helper will not be needed for the optimized implementation;
-- arbitrary-size out-of-core closure;
-- BSFP correctness or performance.
-
-## Current qualification state
-
-Local ordinary Node syntax checking of the experiment wrapper/source passed.
-
-The local sandbox does not contain the CUDA-JS package and cannot reach GitHub to install/clone it, so `inspectDeviceProgram()` has not yet been executed here. This is an environment limitation, not a Device-JS acceptance result.
-
-Next qualification must use current CUDA-JS under its supported Node source-development profile and run:
+Qualified experiment head:
 
 ```text
-node experiments/first-gpu-slice/inspect.mjs
+3269e1215c6772509bd4e5834915827fcd38230a
 ```
 
-The resulting Device-JS contract/identity/helper-usage record should be retained as evidence. Any frontend rejection should be treated as design feedback and the Working Draft/prototype should be corrected rather than compatibility-shimmed.
+Pinned CUDA-JS:
 
-## Next native boundary
+```text
+97c0295ab79add204d4d8ced080a4da4b66149cf
+```
 
-After frontend inspection succeeds, execute the three-stage pipeline through public CUDA-JS operations and compare device `status`, `outputCount`, prefix values and selected indices against `reference/core-primitives.mjs` across empty, sparse, dense, invalid-flag, invalid-extent and insufficient-output-capacity fixtures.
+GitHub Actions run `34419481929`, job `102691587884`, Node v26.7.0: **success**.
 
-No CPU reference function belongs in the production GPU execution path; it is an independent qualification oracle only.
+The run passed:
+
+- 15/15 deterministic reference tests;
+- CUDA-JS `inspectDeviceProgram()` for the three kernels;
+- public CUDA-JS testing-facade construction and submission of one prepared 3-node/2-edge DAG;
+- graceful mock lifecycle cleanup.
+
+Frontend Device-JS identity:
+
+```text
+e6671d97e90f8a6c3c2e7d400d3e65f8f6af06316faa63128f67131c50edd1aa
+```
+
+Only `gpu.thread.globalX` and `gpu.atomic.cas` were required by the inspected source. No shared-memory, local-array, warp, cooperative-grid or raw native capability is a correctness prerequisite for this experimental slice.
+
+See `docs/evidence/2026-09-09-first-gpu-slice-portable-boundary.md` for the exact claim boundary.
+
+## Public orchestration experiment
+
+`execution-plan.mjs` constructs the chain only through public `cuda-js` APIs:
+
+```text
+compileDeviceProgram
+  -> runtime.loadModule
+  -> module.getFunction
+  -> runtime.prepareOperationDag
+```
+
+The prepared DAG exposes named device-memory/view bindings for:
+
+```text
+flags
+prefix
+activeCount
+outputIndices
+outputCount
+status
+```
+
+The testing harness waits only to qualify terminal behavior. A production GPU-owned control path must remain nonblocking at the Node event-loop level.
+
+## Known Working-Draft pressure
+
+The current physical plan requires positive input/output capacities because its first access declarations use nonempty ordinary ranges. This is a prototype choice, **not yet a public semantic rule**. Zero logical/physical capacity representation must be resolved before Candidate promotion rather than accidentally inherited from this implementation.
+
+## What remains unproved
+
+- physical GPU result correctness;
+- useful scan/select performance;
+- production CUDA-Algorithms API shape;
+- optimized shared-memory/warp requirements;
+- stable radix/keyed device implementations;
+- RankedClosure;
+- arbitrary-size out-of-core progression.
+
+## Next
+
+The next falsifier is stable integer ordering with device-resident active extent. It should stress the index-indirection/wide-key design using the current accepted CUDA-JS surface before any lower capability widening is requested.
