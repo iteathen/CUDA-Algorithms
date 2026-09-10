@@ -20,7 +20,7 @@ function exclusiveFlagScanU32(flags, prefix, activeCount, inputCapacity, status)
 
   if (active > inputCapacity) {
     if (i === gpu.u32(0)) {
-      status[gpu.u32(0)] = gpu.u32(1);
+      gpu.atomic.cas(status, gpu.u32(0), gpu.u32(0), gpu.u32(1));
     }
     return;
   }
@@ -47,13 +47,13 @@ function selectIndicesFromScanU32(flags, prefix, outputIndices, outputCount, act
   const i = gpu.thread.globalX();
   const active = activeCount[gpu.u32(0)];
 
-  if (status[gpu.u32(0)] !== gpu.u32(0)) {
+  if (gpu.atomic.loadRelaxedDevice(status, gpu.u32(0)) !== gpu.u32(0)) {
     return;
   }
 
   if (active > inputCapacity) {
     if (i === gpu.u32(0)) {
-      status[gpu.u32(0)] = gpu.u32(1);
+      gpu.atomic.cas(status, gpu.u32(0), gpu.u32(0), gpu.u32(1));
     }
     return;
   }
@@ -67,7 +67,7 @@ function selectIndicesFromScanU32(flags, prefix, outputIndices, outputCount, act
   if (i === gpu.u32(0)) {
     outputCount[gpu.u32(0)] = selectedCount;
     if (selectedCount > outputCapacity) {
-      status[gpu.u32(0)] = gpu.u32(2);
+      gpu.atomic.cas(status, gpu.u32(0), gpu.u32(0), gpu.u32(2));
     }
   }
 
@@ -83,6 +83,7 @@ function selectIndicesFromScanU32(flags, prefix, outputIndices, outputCount, act
 
 export const deviceProgramRequest = Object.freeze({
   source,
+  compile: Object.freeze({ headerProfile: 'cuda-cccl' }),
   functions: Object.freeze([
     Object.freeze({
       name: 'resetControl',
