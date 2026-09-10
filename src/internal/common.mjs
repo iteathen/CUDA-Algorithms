@@ -1,3 +1,5 @@
+import { inspectDeviceViewRelation } from 'cuda-js';
+
 export const U32_BYTES = 4;
 export const DEFAULT_BLOCK_SIZE = 128;
 export const CUDA_THREAD_BLOCK_CEILING = 1024;
@@ -45,13 +47,15 @@ export function requireU32View(view, minimumElements, label, requiredAccess) {
   return view;
 }
 
-export function rejectSameViewWriteConflicts(entries) {
+export function rejectViewWriteConflicts(entries) {
   for (let left = 0; left < entries.length; left += 1) {
     for (let right = left + 1; right < entries.length; right += 1) {
       const a = entries[left];
       const b = entries[right];
-      if (a.view === b.view && (a.access !== 'read' || b.access !== 'read')) {
-        throw new RangeError(`${a.label} and ${b.label} must not use the same CUDA-JS device view when either role writes`);
+      if (a.access === 'read' && b.access === 'read') continue;
+      const relation = inspectDeviceViewRelation(a.view, b.view);
+      if (relation !== 'disjoint') {
+        throw new RangeError(`${a.label} and ${b.label} must be disjoint because at least one role writes; CUDA-JS reports ${relation}`);
       }
     }
   }
