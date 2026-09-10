@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "updated": "2026-09-09",
-  "status": "first_candidate_primitives_implemented_ranked_closure_next",
+  "status": "candidate_alias_boundary_resolved_ranked_closure_active",
   "objective": "Build reusable provider-neutral GPU algorithms and GPU-owned ranked/workset closure while keeping Node administrative and all CUDA/native mechanisms in CUDA-JS.",
   "authority": [
     "AGENTS.md",
@@ -19,13 +19,14 @@
       "SPEC-0003 stable index selection and permutation ordering"
     ],
     "package": "cuda-algorithms@0.1.0-alpha.0",
-    "cuda_js_pair": "e9837f20acf7901d445a1e7a2045459a1ae0118a / cuda-js@0.1.0-alpha.19",
+    "cuda_js_pair": "98e2ebc942c14d63acf4dd82e912dd548c363a05 / cuda-js@0.1.0-alpha.20",
     "portable_evidence": [
       "23/23 reference tests",
-      "5/5 maintained candidate API tests",
+      "6/6 maintained Candidate API tests",
       "Device-JS inspection passed",
       "public prepared-DAG composition passed",
-      "native maintained-candidate harness syntax-valid"
+      "same-range and partially overlapping sibling-view write conflicts rejected through CUDA-JS inspectDeviceViewRelation",
+      "native maintained-Candidate harness syntax-valid"
     ],
     "native_cuda_algorithms": "not yet run",
     "performance": "unqualified correctness-first O(n^2) kernels"
@@ -36,16 +37,19 @@
     "lexicographic ordering reorders index sequences by external u32 key-word columns",
     "consumer owns exact record/equality semantics; CUDA-Algorithms owns generic ordering/segmentation mechanics",
     "submit returns ordinary CUDA-JS operation; production plan never waits or performs CPU semantic advancement",
-    "exact same-view write conflicts reject; pure read/read reuse is legal"
+    "read/read ranges may overlap when the algorithm permits it; every pair involving a write must be disjoint according to CUDA-JS public range truth"
   ],
-  "lower_dependency": {
+  "lower_dependency_resolution": {
     "issue": "iteathen/CUDA-JS#260",
-    "need": "consumer-neutral public relation for disjoint/overlapping sibling device views without exposing parent/native identity",
-    "effect": "full overlapping-sibling-view alias guarantee remains unaccepted; exact same-object write conflicts are already protected"
+    "merged_commit": "98e2ebc942c14d63acf4dd82e912dd548c363a05",
+    "package": "cuda-js@0.1.0-alpha.20",
+    "stud": "inspectDeviceViewRelation(a,b) -> same-range|overlap|disjoint",
+    "ownership": "CUDA-JS owns the byte-range fact; CUDA-Algorithms owns algorithm alias policy"
   },
   "working_draft": {
     "spec": "docs/specs/SPEC-0004-device-worksets-and-fixed-point-closure.md",
     "next_target": "ranked acyclic closure before general cyclic monotone closure",
+    "candidate_callback_direction": "assess typed Device-JS library composition as the static consumer-function seam; do not freeze until reference and GPU vertical slices survive",
     "rule": "Keep callback/composition, workset representation and epoch details mutable until the first real vertical slice establishes the lower reusable algebra."
   },
   "next_actions": [
@@ -53,7 +57,7 @@
     "map at least BSFP-like and a materially different non-game consumer into the same ranked workset algebra without moving their domain semantics downward",
     "build the smallest GPU-owned ranked-closure epoch through public CUDA-JS and Candidate primitives",
     "keep convergence/rank-complete/capacity-yield decisions on device and Node administrative only",
-    "run experiments/native-qualification/run.mjs on the gate-32-approved Windows CUDA-JS host when direct host execution is available",
+    "run experiments/native-qualification/run.mjs on an exact alpha.20 Windows CUDA-JS host and record the exact source/profile evidence",
     "measure the correctness kernels only after native parity, then route any demonstrated generic shared-memory/warp requirement to CUDA-JS"
   ],
   "repository_governance": {
@@ -66,7 +70,7 @@
     "make BSFP or another first consumer the closure vocabulary",
     "move consumer equality, proof, table or graph semantics into CUDA-Algorithms",
     "require host readback between GPU stages for active counts or mathematical progression",
-    "add a private CUDA-JS parent/view registry to work around CUDA-JS #260",
+    "recreate CUDA-JS view parent/range identity now that the public relation exists",
     "request shared-memory/warp CUDA-JS widening before measurements demonstrate the need",
     "add Python, local C/C++/CUDA/PTX/native FFI, private lower imports or provider-native public passthrough"
   ]
