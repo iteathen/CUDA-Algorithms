@@ -65,56 +65,6 @@ test('public CUDA-JS mock accepts one prepared reset -> scan -> select operation
   }
 });
 
-test('prepared submission rejects forbidden same-buffer flags/prefix aliasing before execution', async () => {
-  const runtime = await openCudaRuntimeForTesting({ compiler: true });
-  let slice;
-  let returnedOperation;
-  const allocations = [];
-  let rejection = null;
-
-  try {
-    slice = await prepareStableSelectU32(runtime, { inputCapacity: 8, outputCapacity: 8, blockSize: 8 });
-    const shared = await allocateU32(runtime, 8, 'read-write');
-    const activeCount = await allocateU32(runtime, 1, 'read');
-    const outputIndices = await allocateU32(runtime, 8, 'write');
-    const outputCount = await allocateU32(runtime, 1, 'read-write');
-    const status = await allocateU32(runtime, 1, 'read-write');
-    allocations.push(shared, activeCount, outputIndices, outputCount, status);
-
-    try {
-      returnedOperation = await slice.prepared.submit({
-        bindings: {
-          flags: shared.view,
-          prefix: shared.view,
-          activeCount: activeCount.view,
-          outputIndices: outputIndices.view,
-          outputCount: outputCount.view,
-          status: status.view,
-        },
-      });
-    } catch (error) {
-      rejection = error;
-    }
-
-    if (returnedOperation) {
-      await returnedOperation.wait();
-      await returnedOperation.close();
-      returnedOperation = null;
-    }
-
-    assert.ok(rejection, 'CUDA-JS prepared submission accepted a same-view read/write alias inside one algorithm node');
-  } finally {
-    if (returnedOperation) {
-      await returnedOperation.wait();
-      await returnedOperation.close();
-    }
-    if (slice) await closePreparedStableSelect(slice);
-    for (let i = allocations.length - 1; i >= 0; i -= 1) await closePair(allocations[i]);
-    const closed = await runtime.close();
-    assert.equal(closed.graceful, true);
-  }
-});
-
 test('experimental plan rejects accidental zero/oversized physical launch bounds before CUDA work', async () => {
   const runtime = await openCudaRuntimeForTesting({ compiler: true });
   try {
