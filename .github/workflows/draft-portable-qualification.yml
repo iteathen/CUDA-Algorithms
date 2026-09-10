@@ -1,0 +1,49 @@
+name: draft-portable-qualification
+
+on:
+  push:
+    branches:
+      - design/first-algorithm-profile
+
+permissions:
+  contents: read
+
+jobs:
+  portable-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CUDA-Algorithms
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Checkout exact CUDA-JS authority
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: iteathen/CUDA-JS
+          ref: 97c0295ab79add204d4d8ced080a4da4b66149cf
+          path: cuda-js
+
+      - name: Use supported Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26.7.0
+
+      - name: Install exact CUDA-JS dependencies
+        run: npm ci --prefix cuda-js
+
+      - name: Bind exact CUDA-JS checkout as public package
+        run: |
+          mkdir -p node_modules
+          ln -s ../cuda-js node_modules/cuda-js
+
+      - name: Run reference semantics
+        run: node --test reference/core-primitives.test.mjs reference/permutation-ordering.test.mjs
+
+      - name: Inspect Device-JS experiments
+        run: |
+          node experiments/first-gpu-slice/inspect.mjs
+          node experiments/stable-permutation-ordering/inspect.mjs
+
+      - name: Validate prepared-DAG composition through public CUDA-JS mock
+        run: |
+          node --test experiments/first-gpu-slice/portable-orchestration.test.mjs
+          node --test experiments/stable-permutation-ordering/portable-orchestration.test.mjs
