@@ -47,3 +47,6 @@ jobs:
         run: |
           node --test experiments/first-gpu-slice/portable-orchestration.test.mjs
           node --test experiments/stable-permutation-ordering/portable-orchestration.test.mjs
+
+      - name: Syntax-check physical GPU qualification harness
+        run: node --check experiments/native-qualification/run.mjs
