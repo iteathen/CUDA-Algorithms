@@ -1,0 +1,27 @@
+{
+  "name": "cuda-algorithms",
+  "version": "0.1.0-alpha.0",
+  "description": "Provider-neutral GPU parallel algorithms for the CUDA-JS ecosystem.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=26.1.0"
+  },
+  "peerDependencies": {
+    "cuda-js": "0.1.0-alpha.20"
+  },
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "src/"
+  ],
+  "scripts": {
+    "test:reference": "node --test reference/core-primitives.test.mjs reference/permutation-ordering.test.mjs reference/grouping-boundary.test.mjs reference/ranked-index-closure.test.mjs",
+    "test:candidate": "node --test test/candidate-api.test.mjs",
+    "verify:documents": "node tools/verify-documents.mjs"
+  }
+}

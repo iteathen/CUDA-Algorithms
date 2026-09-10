@@ -19,12 +19,40 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Checkout CUDA-Algorithms
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+
+      - name: Checkout exact CUDA-JS authority
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          node-version: 24.15.0
-      - name: Validate document links and JSON
+          repository: iteathen/CUDA-JS
+          ref: 98e2ebc942c14d63acf4dd82e912dd548c363a05
+          path: cuda-js
+          persist-credentials: false
+
+      - name: Use supported Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 26.7.0
+
+      - name: Install exact CUDA-JS dependencies
+        run: npm ci --prefix cuda-js
+
+      - name: Bind exact CUDA-JS checkout as public package
         run: |
-          node tools/verify-documents.mjs
+          mkdir -p node_modules
+          ln -s ../cuda-js node_modules/cuda-js
+
+      - name: Validate document links and JSON
+        run: node tools/verify-documents.mjs
+
+      - name: Run reference semantics
+        run: npm run test:reference
+
+      - name: Run maintained Candidate API checks
+        run: npm run test:candidate
+
+      - name: Syntax-check physical GPU qualification harness
+        run: node --check experiments/native-qualification/run.mjs
