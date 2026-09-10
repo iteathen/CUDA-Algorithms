@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  inspect:
+  portable-boundary:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout CUDA-Algorithms
@@ -30,20 +30,16 @@ jobs:
       - name: Install exact CUDA-JS dependencies
         run: npm ci --prefix cuda-js
 
-      - name: Inspect first Device-JS slice
+      - name: Bind exact CUDA-JS checkout as public package
         run: |
-          node --input-type=module <<'EOF'
-          import { inspectDeviceProgram } from './cuda-js/components/runtime-facade/index.mjs';
-          import { deviceProgramRequest } from './experiments/first-gpu-slice/device-program.mjs';
+          mkdir -p node_modules
+          ln -s ../cuda-js node_modules/cuda-js
 
-          const inspected = inspectDeviceProgram(deviceProgramRequest);
-          const result = {
-            cudaJsCommit: '97c0295ab79add204d4d8ced080a4da4b66149cf',
-            node: process.version,
-            contract: inspected.deviceProgram.contract,
-            sha256: inspected.deviceProgram.sha256,
-            kernels: inspected.deviceProgram.kernels,
-            publicHelperUsage: inspected.inspection.publicHelperUsage,
-          };
-          console.log(JSON.stringify(result, null, 2));
-          EOF
+      - name: Run reference semantics
+        run: node --test reference/core-primitives.test.mjs
+
+      - name: Inspect first Device-JS slice
+        run: node experiments/first-gpu-slice/inspect.mjs
+
+      - name: Validate prepared-DAG composition through public CUDA-JS mock
+        run: node --test experiments/first-gpu-slice/portable-orchestration.test.mjs
