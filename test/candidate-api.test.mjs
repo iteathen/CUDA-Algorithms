@@ -35,6 +35,7 @@ test('candidate stable-select plan submits one nonblocking CUDA-JS operation', a
     assert.equal(plan.kind, 'cuda-algorithms-plan');
     assert.equal(plan.family, 'stable-select-indices');
     assert.equal(plan.workspace.prefixElements, 16);
+    assert.equal(plan.aliasing.relationOwner, 'cuda-js:inspectDeviceViewRelation');
 
     const flags = await allocateU32(runtime, 16, 'read');
     const prefix = await allocateU32(runtime, 16, 'read-write');
@@ -54,7 +55,7 @@ test('candidate stable-select plan submits one nonblocking CUDA-JS operation', a
   }
 });
 
-test('candidate stable-select rejects exact-view write conflicts but permits read-read reuse', async () => {
+test('candidate stable-select rejects same-range writes but permits read-read reuse', async () => {
   const runtime = await openCudaRuntimeForTesting({ compiler: true });
   const allocations = [];
   let plan;
@@ -71,13 +72,46 @@ test('candidate stable-select rejects exact-view write conflicts but permits rea
 
     await assert.rejects(
       () => plan.submit({ flags: sharedReadWrite.view, prefix: sharedReadWrite.view, activeCount: sharedRead.view, outputIndices: outputIndices.view, outputCount: outputCount.view, status: status.view }),
-      /must not use the same CUDA-JS device view when either role writes/,
+      /must be disjoint because at least one role writes; CUDA-JS reports same-range/,
     );
 
     operation = await plan.submit({ flags: sharedRead.view, prefix: prefix.view, activeCount: sharedRead.view, outputIndices: outputIndices.view, outputCount: outputCount.view, status: status.view });
     assert.equal((await operation.wait()).status, 'completed');
   } finally {
     await closeAll(runtime, plan, operation, allocations);
+  }
+});
+
+test('candidate stable-select rejects overlapping sibling views through lower-owned range truth', async () => {
+  const runtime = await openCudaRuntimeForTesting({ compiler: true });
+  let plan;
+  const ordinary = [];
+  let backing;
+  let flags;
+  let prefix;
+  try {
+    plan = await createStableSelectIndicesU32Plan(runtime, { inputCapacity: 8, outputCapacity: 8, blockSize: 8 });
+    backing = await runtime.allocateDevice({ byteLength: 64 });
+    flags = await backing.view({ dtype: 'u32', byteOffset: 0, elementCount: 8, access: 'read' });
+    prefix = await backing.view({ dtype: 'u32', byteOffset: 16, elementCount: 8, access: 'read-write' });
+    const activeCount = await allocateU32(runtime, 1, 'read');
+    const outputIndices = await allocateU32(runtime, 8, 'write');
+    const outputCount = await allocateU32(runtime, 1, 'read-write');
+    const status = await allocateU32(runtime, 1, 'read-write');
+    ordinary.push(activeCount, outputIndices, outputCount, status);
+
+    await assert.rejects(
+      () => plan.submit({ flags, prefix, activeCount: activeCount.view, outputIndices: outputIndices.view, outputCount: outputCount.view, status: status.view }),
+      /must be disjoint because at least one role writes; CUDA-JS reports overlap/,
+    );
+  } finally {
+    if (plan) await plan.close();
+    for (let i = ordinary.length - 1; i >= 0; i -= 1) await closeAllocation(ordinary[i]);
+    if (prefix) await prefix.close();
+    if (flags) await flags.close();
+    if (backing) await backing.close();
+    const closed = await runtime.close();
+    assert.equal(closed.graceful, true);
   }
 });
 
@@ -91,6 +125,7 @@ test('candidate lexicographic ordering plan composes arbitrary bounded key-word 
     assert.equal(plan.family, 'stable-lexicographic-order-indices');
     assert.equal(plan.resultBinding, 'indicesB');
     assert.equal(plan.realizationBounds.maxKeyWordCount, 31);
+    assert.equal(plan.aliasing.relationOwner, 'cuda-js:inspectDeviceViewRelation');
 
     const keyWords = [];
     for (let i = 0; i < 3; i += 1) {
@@ -113,7 +148,7 @@ test('candidate lexicographic ordering plan composes arbitrary bounded key-word 
   }
 });
 
-test('candidate ordering rejects exact-view write conflicts but permits duplicate read-only key views', async () => {
+test('candidate ordering rejects write-range conflicts but permits duplicate read-only key views', async () => {
   const runtime = await openCudaRuntimeForTesting({ compiler: true });
   const allocations = [];
   let plan;
@@ -130,11 +165,11 @@ test('candidate ordering rejects exact-view write conflicts but permits duplicat
 
     await assert.rejects(
       () => plan.submit({ keyWords: [sharedReadWrite.view, key.view], indicesA: sharedReadWrite.view, indicesB: indicesB.view, activeCount: activeCount.view, status: status.view }),
-      /must not use the same CUDA-JS device view when either role writes/,
+      /must be disjoint because at least one role writes; CUDA-JS reports same-range/,
     );
     await assert.rejects(
       () => plan.submit({ keyWords: [key.view, key.view], indicesA: indicesA.view, indicesB: indicesA.view, activeCount: activeCount.view, status: status.view }),
-      /must not use the same CUDA-JS device view when either role writes/,
+      /must be disjoint because at least one role writes; CUDA-JS reports same-range/,
     );
 
     operation = await plan.submit({ keyWords: [key.view, key.view], indicesA: indicesA.view, indicesB: indicesB.view, activeCount: activeCount.view, status: status.view });
