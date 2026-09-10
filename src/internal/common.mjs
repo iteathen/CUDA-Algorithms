@@ -45,6 +45,10 @@ export function requireU32View(view, minimumElements, label, requiredAccess) {
   return view;
 }
 
+export function rejectSameViewAlias(left, leftLabel, right, rightLabel) {
+  if (left === right) throw new RangeError(`${leftLabel} and ${rightLabel} must not be the same CUDA-JS device view`);
+}
+
 export async function closeResources(resources, label = 'CUDA-Algorithms plan') {
   const failures = [];
   for (let i = resources.length - 1; i >= 0; i -= 1) {
