@@ -152,6 +152,25 @@ Not every primitive admits every state. Exact spelling and the physical device r
 
 A CUDA operation can complete successfully at the runtime level while its algorithm result reports a bounded semantic condition such as `capacity-exhausted`; the library must not collapse these categories.
 
+### Device status/control access discipline
+
+The first GPU-facing prototype exposed an important memory-model requirement: a status/control location that can be observed and updated by multiple threads in one kernel must use one coherent accepted access discipline for that concurrent region.
+
+For Device-JS implementations using an ordinary device-memory status word:
+
+- concurrent observations/updates of the same status location must use accepted CUDA-JS atomic helpers with compatible dtype/scope/order semantics;
+- do not mix atomic operations with non-atomic concurrent access to the same location;
+- an ordered single-thread initialization kernel may initialize the word non-atomically when no concurrent access exists and the next kernel is ordered by the lower CUDA-JS execution contract;
+- first-error publication may use compare-and-swap from `ok` to an error code so racing error reporters cannot silently overwrite an earlier failure;
+- downstream kernels that consume a concurrently published device status use an accepted atomic observation form rather than an ordinary load while concurrent publication is possible;
+- stronger acquire/release/system semantics are not implied unless cross-location ordering or host/device publication actually requires them.
+
+This is an algorithm-level requirement to use the lower memory model correctly, not a CUDA-Algorithms-owned atomic API. CUDA-JS remains authoritative for the available atomic helper semantics and native lowering.
+
+A semantic payload produced while status is non-`ok` is invalid unless the owning family explicitly defines a valid partial-result state. Capacity or validation failure must not become success-shaped data merely because some threads wrote output before the failure was observed.
+
+The physical status encoding remains a Working Draft detail. What is stable at this stage is the separation between runtime terminality and algorithm semantic validity plus the requirement for a coherent concurrent access discipline.
+
 ## Workspace
 
 Every plan states its logical workspace requirement as a bounded byte/alignment record derived from material inputs such as:
