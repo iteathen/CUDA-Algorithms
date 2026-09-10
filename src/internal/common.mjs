@@ -45,8 +45,16 @@ export function requireU32View(view, minimumElements, label, requiredAccess) {
   return view;
 }
 
-export function rejectSameViewAlias(left, leftLabel, right, rightLabel) {
-  if (left === right) throw new RangeError(`${leftLabel} and ${rightLabel} must not be the same CUDA-JS device view`);
+export function rejectSameViewWriteConflicts(entries) {
+  for (let left = 0; left < entries.length; left += 1) {
+    for (let right = left + 1; right < entries.length; right += 1) {
+      const a = entries[left];
+      const b = entries[right];
+      if (a.view === b.view && (a.access !== 'read' || b.access !== 'read')) {
+        throw new RangeError(`${a.label} and ${b.label} must not use the same CUDA-JS device view when either role writes`);
+      }
+    }
+  }
 }
 
 export async function closeResources(resources, label = 'CUDA-Algorithms plan') {
