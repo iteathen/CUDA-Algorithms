@@ -54,5 +54,7 @@ jobs:
       - name: Run maintained Candidate API checks
         run: npm run test:candidate
 
-      - name: Syntax-check physical GPU qualification harness
-        run: node --check experiments/native-qualification/run.mjs
+      - name: Syntax-check physical GPU qualification harnesses
+        run: |
+          node --check experiments/native-qualification/run.mjs
+          node --check experiments/native-qualification/run-ranked-derived-activation.mjs

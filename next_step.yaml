@@ -1,8 +1,8 @@
 {
-  "schema_version": 2,
+  "schema_version": 4,
   "updated": "2026-09-09",
-  "status": "candidate_alias_boundary_resolved_ranked_closure_active",
-  "objective": "Build reusable provider-neutral GPU algorithms and GPU-owned ranked/workset closure while keeping Node administrative and all CUDA/native mechanisms in CUDA-JS.",
+  "status": "ranked_derived_activation_portable_qualified_native_next",
+  "objective": "Qualify and evolve reusable provider-neutral GPU ranked/workset algorithms while keeping Node administrative and all CUDA/native mechanisms in CUDA-JS.",
   "authority": [
     "AGENTS.md",
     "AGENT_LOCAL.md",
@@ -10,68 +10,65 @@
     "docs/specs/SPEC-0001-native-boundary-and-js-only-implementation.md",
     "docs/specs/SPEC-0002-algorithm-plans-active-extents-and-device-chaining.md",
     "docs/specs/SPEC-0003-core-sequence-and-keyed-primitives.md",
+    "docs/specs/SPEC-0004-device-worksets-and-fixed-point-closure.md",
+    "docs/design/2026-09-09-ranked-derived-activation-profile.md",
     "docs/decisions/ADR-0001-independent-gpu-parallel-algorithm-owner.md"
   ],
-  "branch": "design/first-algorithm-profile",
-  "candidate": {
-    "specs": [
-      "SPEC-0002 algorithm plans/device chaining",
-      "SPEC-0003 stable index selection and permutation ordering"
-    ],
-    "package": "cuda-algorithms@0.1.0-alpha.0",
-    "cuda_js_pair": "98e2ebc942c14d63acf4dd82e912dd548c363a05 / cuda-js@0.1.0-alpha.20",
-    "portable_evidence": [
-      "23/23 reference tests",
-      "6/6 maintained Candidate API tests",
-      "Device-JS inspection passed",
-      "public prepared-DAG composition passed",
-      "same-range and partially overlapping sibling-view write conflicts rejected through CUDA-JS inspectDeviceViewRelation",
-      "native maintained-Candidate harness syntax-valid"
-    ],
-    "native_cuda_algorithms": "not yet run",
-    "performance": "unqualified correctness-first O(n^2) kernels"
+  "protected_milestone": {
+    "pr": 7,
+    "main_commit": "6dac37af888c70e437caac3c0eb7224cd87dd73f",
+    "meaning": "First maintained Candidate selection/ordering primitives plus ranked-closure reference/evidence baseline are integrated."
   },
-  "selected_design": [
-    "device-resident active counts with explicit host-known capacities",
-    "stable selection emits indices rather than moving consumer records",
-    "lexicographic ordering reorders index sequences by external u32 key-word columns",
-    "consumer owns exact record/equality semantics; CUDA-Algorithms owns generic ordering/segmentation mechanics",
-    "submit returns ordinary CUDA-JS operation; production plan never waits or performs CPU semantic advancement",
-    "read/read ranges may overlap when the algorithm permits it; every pair involving a write must be disjoint according to CUDA-JS public range truth"
-  ],
-  "lower_dependency_resolution": {
-    "issue": "iteathen/CUDA-JS#260",
-    "merged_commit": "98e2ebc942c14d63acf4dd82e912dd548c363a05",
-    "package": "cuda-js@0.1.0-alpha.20",
-    "stud": "inspectDeviceViewRelation(a,b) -> same-range|overlap|disjoint",
-    "ownership": "CUDA-JS owns the byte-range fact; CUDA-Algorithms owns algorithm alias policy"
+  "branch": "feature/ranked-closure",
+  "draft_pr": 8,
+  "cuda_js_pair": {
+    "revision": "98e2ebc942c14d63acf4dd82e912dd548c363a05",
+    "package": "cuda-js@0.1.0-alpha.20"
   },
-  "working_draft": {
-    "spec": "docs/specs/SPEC-0004-device-worksets-and-fixed-point-closure.md",
-    "next_target": "ranked acyclic closure before general cyclic monotone closure",
-    "candidate_callback_direction": "assess typed Device-JS library composition as the static consumer-function seam; do not freeze until reference and GPU vertical slices survive",
-    "rule": "Keep callback/composition, workset representation and epoch details mutable until the first real vertical slice establishes the lower reusable algebra."
+  "ranked_derived_activation": {
+    "status": "working_subprofile_portable_qualified",
+    "public_plan": "createRankedDerivedActivationU32Plan",
+    "semantic_scope": "finite implicit/static ranked item universes",
+    "typed_consumer_signature": "(u32 sourceIndex, u32 emissionLane) -> u32 targetIndex | 0xffffffff",
+    "algorithm_owned": [
+      "finite capacities and max emissions",
+      "strict rank descent validation",
+      "duplicate-idempotent target activation",
+      "ascending-index next-workset compaction",
+      "device-resident next extent and semantic status",
+      "output-capacity truth",
+      "prepared epoch lifecycle"
+    ],
+    "consumer_owned": [
+      "item and domain meaning",
+      "derivation meaning",
+      "rank meaning subject to strict order",
+      "proof/value/equality/dominance semantics"
+    ],
+    "portable_consumers": [
+      "implicit dependency DAG",
+      "staged data lineage",
+      "Connect4 CUDA-BSFP support-lattice predecessor mapping"
+    ],
+    "portable_ci_run": 34438628848,
+    "native_harness": "experiments/native-qualification/run-ranked-derived-activation.mjs",
+    "native_result": "not yet run",
+    "performance": "unqualified"
   },
   "next_actions": [
-    "implement an independent ranked-closure reference model and shard-invariance falsifiers",
-    "map at least BSFP-like and a materially different non-game consumer into the same ranked workset algebra without moving their domain semantics downward",
-    "build the smallest GPU-owned ranked-closure epoch through public CUDA-JS and Candidate primitives",
-    "keep convergence/rank-complete/capacity-yield decisions on device and Node administrative only",
-    "run experiments/native-qualification/run.mjs on an exact alpha.20 Windows CUDA-JS host and record the exact source/profile evidence",
-    "measure the correctness kernels only after native parity, then route any demonstrated generic shared-memory/warp requirement to CUDA-JS"
+    "run experiments/native-qualification/run-ranked-derived-activation.mjs on a real NVIDIA CUDA host",
+    "preserve raw native result plus exact CUDA-Algorithms CUDA-JS Node GPU driver provider identity",
+    "if native parity passes reconcile SPEC-0004 with the demonstrated implicit ranked derived activation subprofile without claiming arbitrary callback support",
+    "keep broader runtime-record or context callback shapes open until a materially different real consumer demonstrates need",
+    "measure performance only after native correctness and route demonstrated generic lower mechanism gaps to CUDA-JS"
   ],
-  "repository_governance": {
-    "issue": 2,
-    "status": "main_protected_read_only_ci_present_remaining_admin_parity_not_blocking_algorithm_work"
-  },
   "do_not": [
-    "promote Candidate specs to Accepted without physical upper-layer correctness evidence",
-    "freeze SPEC-0004 callback/epoch API before a real closure vertical slice",
-    "make BSFP or another first consumer the closure vocabulary",
-    "move consumer equality, proof, table or graph semantics into CUDA-Algorithms",
-    "require host readback between GPU stages for active counts or mathematical progression",
-    "recreate CUDA-JS view parent/range identity now that the public relation exists",
-    "request shared-memory/warp CUDA-JS widening before measurements demonstrate the need",
-    "add Python, local C/C++/CUDA/PTX/native FFI, private lower imports or provider-native public passthrough"
+    "promote SPEC-0004 to Accepted from portable evidence alone",
+    "claim arbitrary data-driven graph callback support from the index+lane subprofile",
+    "make BSFP or another consumer the generic vocabulary",
+    "move consumer proof value equality dominance table graph or record semantics into CUDA-Algorithms",
+    "require host readback for mathematical progression",
+    "request CUDA-JS widening without demonstrated generic need",
+    "add Python local C C++ CUDA C++ hand PTX native FFI private lower imports or provider-native public passthrough"
   ]
 }

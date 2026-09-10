@@ -2,57 +2,49 @@
 
 **Updated:** 2026-09-09
 
-**Architecture/ownership:** Accepted under ADR-0001 and SPEC-0001.
-**First maintained algorithm surface:** Candidate; implemented on `design/first-algorithm-profile`.
-**Native CUDA-Algorithms result qualification:** not yet run.
+**Architecture/ownership:** Accepted under ADR-0001 and SPEC-0001.  
+**Protected Candidate milestone:** `main@6dac37af888c70e437caac3c0eb7224cd87dd73f` through PR #7.  
+**Current development branch:** `feature/ranked-closure`.  
+**Current draft PR:** #8 — generic ranked derived activation vertical slice.  
+**Native ranked-activation numerical qualification:** not yet run.  
 **Performance support/claims:** none.
 
 ## Current work
 
-- #1 ownership/bootstrap — completed.
-- #2 repository controls — `main` protected; remaining admin parity tracked separately and does not block algorithm work.
-- #3 first consumer-backed algorithm profile — active.
+SPEC-0004 remains Working Draft. The first implemented consumer-composition subprofile is now a deliberately narrower **implicit ranked derived activation** plan rather than a claim that general RankedClosure is complete.
 
-Protected `main` includes PR #6 read-only CI/document verification. The feature branch merged that protected-main baseline before continued development.
-
-## Candidate specifications
-
-- **SPEC-0002 — Algorithm Plans, Active Extents, and Device Chaining:** Candidate.
-- **SPEC-0003 — Stable Index Selection and Permutation Ordering:** Candidate.
-- **SPEC-0004 — Device Worksets and Fixed-Point Closure:** Working Draft.
-
-Candidate is not Accepted compatibility/support authority. Breaking corrections remain allowed before acceptance when qualification exposes a better complete design.
-
-## Maintained Candidate implementation
-
-Development package identity:
+The working public branch surface adds:
 
 ```text
-cuda-algorithms@0.1.0-alpha.0
-peer: cuda-js@0.1.0-alpha.20
+createRankedDerivedActivationU32Plan(...)
 ```
 
-Maintained public Candidate surface:
+Its exact first-profile consumer seam is a CUDA-JS SPEC-0028 typed device-library export:
 
 ```text
-createStableSelectIndicesU32Plan(...)
-createStableLexicographicOrderIndicesU32Plan(...)
+(u32 sourceIndex, u32 emissionLane) -> u32 targetIndex | 0xffffffff
 ```
 
-Both plans:
+CUDA-Algorithms owns only the bounded emission lanes, strict rank-descent validation, duplicate-idempotent target activation, deterministic ascending-index compaction, device-resident next extent/status, capacity truth, and prepared-epoch lifecycle.
 
-- use public CUDA-JS only;
-- operate over public `u32` device views;
-- use device-resident active counts;
-- return the ordinary CUDA-JS operation from `submit()`;
-- do not call `wait()` or read results inside the production API;
-- own bounded plan-resource cleanup without creating a second native-operation lifecycle.
+Consumers retain item/domain meaning, derivation meaning, proof/value/equality/dominance semantics, and rank meaning subject to the strict ordering precondition.
 
-Stable lexicographic ordering keeps consumer records in place and reorders an index sequence by external key-word columns. The current prepared-DAG realization supports at most 31 key words because CUDA-JS currently admits 32 prepared kernel nodes; this is a realization limit, not an algorithmic key-width limit.
+## Scope / universality boundary
 
-## Current portable evidence
+This implemented subprofile is appropriate for finite **implicit/static ranked state spaces** whose target dependency is computable from source index plus a finite emission lane.
 
-Exact portable Candidate evidence uses:
+Materially different examples already exercised through the same typed Device-JS composition path are:
+
+- implicit dependency-DAG activation;
+- staged data-lineage dependency activation.
+
+The reference layer additionally covers shard-size invariance, duplicate activation, rank and target bounds, capacity yield, and multiple implicit dependency shapes.
+
+This does **not** claim a universal callback for arbitrary runtime graph/record data. If a later real consumer requires device-resident record/context access, widen the generic seam only from that evidence. Do not invent a generic record ABI preemptively.
+
+## Portable qualification
+
+Exact lower pair:
 
 ```text
 CUDA-JS: 98e2ebc942c14d63acf4dd82e912dd548c363a05
@@ -60,60 +52,86 @@ package: cuda-js@0.1.0-alpha.20
 Node:    v26.7.0
 ```
 
-Latest complete green boundary includes:
+CUDA-Algorithms PR #8 CI passes on the current branch lineage, including:
 
-- 23/23 independent/reference tests;
-- 6/6 maintained Candidate API tests;
-- Device-JS inspection of correctness kernels;
-- public prepared-DAG composition;
-- same-range write-conflict rejection;
-- partially overlapping sibling-view rejection through public CUDA-JS range truth;
-- legal read/read reuse;
-- physical qualification harness syntax validation.
+- reference ranked-derived-activation semantics;
+- implicit-DAG typed Device-JS composition;
+- unrelated staged-data-lineage typed Device-JS composition;
+- exact signature rejection;
+- existing stable-select/stable-order Candidate API checks;
+- document validation;
+- syntax checks for both physical native qualification harnesses.
 
-Current correctness kernels require only accepted Device-JS facilities (`globalX`, CAS and relaxed device-scope atomic status observation). Shared memory/warp/local-array widening is not required for correctness and remains performance-driven.
-
-## CUDA-JS physical substrate
-
-CUDA-JS gate-32 physical evidence was recorded on the exact alpha.19 Windows x64 / GTX 1660 Ti / driver 610.74 / CUDA 13.3 / Node 26.7.0 compatible pair and remains valid for that recorded pair.
-
-CUDA-JS main then added the pure public view-range relation in alpha.20 at `98e2ebc942c14d63acf4dd82e912dd548c363a05`. The relation itself performs no actor/native work and keeps allocation/native identity private.
-
-That gives CUDA-Algorithms the lower relation required for full write-range alias admission policy. It does **not** automatically qualify CUDA-Algorithms numerical/semantic results or silently transfer the earlier package-level native claim to alpha.20.
-
-`experiments/native-qualification/run.mjs` exercises the maintained Candidate API, including valid/error stable selection and two-/three-word stable ordering against independent references. The CUDA-Algorithms physical run remains outstanding and must record the exact alpha.20 revision actually exercised.
-
-## Alias ownership boundary — resolved at public-contract level
-
-Historical falsification showed that prepared-DAG hazards do not own an upper algorithm's intra-node alias policy. CUDA-JS #260 therefore added the correct lower LEGO stud:
+Latest recorded successful CI after the two-consumer/native-harness additions:
 
 ```text
-inspectDeviceViewRelation(a, b)
-  -> same-range | overlap | disjoint
+workflow run: 34438628848
+result:       success
 ```
 
-CUDA-Algorithms now owns the policy over that lower fact:
+Connect4 CUDA-BSFP independently consumed the exact ranked-activation implementation through public package surfaces and passed its pinned portable composition workflow. That consumer evidence does not transfer Connect4 proof semantics into CUDA-Algorithms.
 
-- read/read ranges may overlap where the algorithm permits reuse;
-- any pair involving a write must be `disjoint`;
-- `same-range` or `overlap` rejects before prepared algorithm submission.
+## Physical qualification path
 
-This now covers distinct sibling views without exposing their parent allocation identity.
+`experiments/native-qualification/run-ranked-derived-activation.mjs` is now the dedicated physical harness for this subprofile.
 
-Evidence: `docs/evidence/2026-09-09-device-view-alias-boundary.md`.
+On a real NVIDIA CUDA host it will:
 
-## Next executable work
+- compile and run the implicit-DAG consumer;
+- compile and run the staged-data-lineage consumer;
+- compare activated target sets with the independent JavaScript reference;
+- verify duplicate idempotence;
+- verify output-capacity exhaustion reports the exact required count rather than truncating successfully;
+- verify a strict-rank violation produces semantic failure;
+- close plan/operation/device resources through public CUDA-JS lifecycle.
 
-1. Build the first **ranked-closure** reference/vertical slice under Working Draft SPEC-0004.
-2. Keep derivation/equality/domain semantics with consumers; identify only the generic workset/epoch algebra that survives consumer deletion.
-3. Preserve device-resident progression and bounded administrative yields; no Node semantic loop.
-4. Run the maintained Candidate native harness on the available Windows CUDA-JS host when direct host execution is available to the acting agent/operator.
-5. After native correctness, measure the O(n²) correctness kernels before requesting shared-memory/warp CUDA-JS widening.
+Physical NVIDIA execution remains outstanding. Portable/mock/compiler evidence is not native numerical evidence.
+
+## Existing Candidate specifications
+
+- **SPEC-0002 — Algorithm Plans, Active Extents, and Device Chaining:** Candidate.
+- **SPEC-0003 — Stable Index Selection and Permutation Ordering:** Candidate.
+- **SPEC-0004 — Device Worksets and Fixed-Point Closure:** Working Draft.
+
+The ranked-derived-activation subprofile remains Working while SPEC-0004 is Working. It is not Accepted compatibility authority.
+
+## Existing maintained Candidate implementation
+
+Protected `main` continues to own the already-integrated Candidate primitives:
+
+```text
+createStableSelectIndicesU32Plan(...)
+createStableLexicographicOrderIndicesU32Plan(...)
+```
+
+The ranked-derived-activation work is isolated on `feature/ranked-closure`/draft PR #8 and has not changed protected `main`.
+
+## CUDA-JS boundary
+
+No CUDA-JS mutation was required for this slice.
+
+The implementation uses existing public CUDA-JS capabilities only:
+
+- typed Device-JS library composition;
+- Device-JS program compilation/linking;
+- public device views and opaque range-relation truth;
+- prepared operation DAGs;
+- device-scope CAS/status observation;
+- ordinary CUDA-JS operations and resource lifecycle.
+
+No Python, direct CUDA FFI, C/C++/CUDA C++, hand PTX, private CUDA-JS imports, dynamic device function pointers, or provider-native passthrough were added.
+
+## Next gate
+
+1. Run `node experiments/native-qualification/run-ranked-derived-activation.mjs` on the available real CUDA host and preserve the exact CUDA-Algorithms/CUDA-JS/Node/GPU/driver/provider tuple and raw result.
+2. If physical numerical parity passes, reconcile SPEC-0004 wording with the demonstrated **implicit ranked derived activation** subprofile without over-promoting general RankedClosure.
+3. Keep broader callback/context shapes open until another real consumer demonstrates a reusable need.
+4. Measure performance only after native correctness; route any demonstrated generic lower mechanism gap to CUDA-JS rather than pre-authorizing widening.
 
 ## Claim limits
 
-- Portable/mock/frontend evidence is not native CUDA-Algorithms evidence.
-- CUDA-JS hardware qualification does not transfer automatically to upper algorithm results or later package revisions.
-- Correctness-first kernels make no performance claim.
-- Candidate specs are not Accepted compatibility authority.
-- No BSFP, dataframe, graph or other consumer semantics belong in CUDA-Algorithms.
+- No native ranked-derived-activation numerical result yet.
+- No performance result or recommendation yet.
+- SPEC-0004 is still Working Draft.
+- The implemented index+lane derivation seam is intentionally narrower than arbitrary consumer callbacks.
+- No BSFP, Connect Four, dataframe, graph, proof, W/D/L, or other consumer semantics belong in CUDA-Algorithms.
