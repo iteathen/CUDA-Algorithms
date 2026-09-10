@@ -1,6 +1,6 @@
 import { compileDeviceProgram } from 'cuda-js';
 import { stableSelectIndicesU32DeviceProgram, STABLE_SELECT_INDICES_U32_STATUS } from '../device/stable-select-indices-u32-program.mjs';
-import { binding, blockSize, closeResources, kernelByName, positiveSafeInteger, rejectSameViewAlias, requireU32View, U32_BYTES, u32Bytes } from '../internal/common.mjs';
+import { binding, blockSize, closeResources, kernelByName, positiveSafeInteger, rejectSameViewWriteConflicts, requireU32View, U32_BYTES, u32Bytes } from '../internal/common.mjs';
 
 export const STABLE_SELECT_INDICES_U32_CONTRACT = 'CUDA-Algorithms-stable-select-indices-u32-candidate-v0';
 
@@ -76,23 +76,26 @@ export async function createStableSelectIndicesU32Plan(runtime, options = {}) {
     blockSize: threads,
     status: STABLE_SELECT_INDICES_U32_STATUS,
     workspace: Object.freeze({ prefixElements: inputCapacity, prefixBytes: inputBytes, controlU32Elements: 2 }),
-    aliasing: Object.freeze({ exactSameViewRejected: true, overlappingSiblingViews: 'requires CUDA-JS #260 before acceptance' }),
+    aliasing: Object.freeze({ exactWriteConflictRejected: true, readReadSameViewAllowed: true, overlappingSiblingViews: 'requires CUDA-JS #260 before acceptance' }),
     async submit(bindings) {
       if (closed) throw new Error('stable select plan is closed');
-      const views = [
-        ['flags', requireU32View(bindings?.flags, inputCapacity, 'flags', 'read')],
-        ['prefix', requireU32View(bindings?.prefix, inputCapacity, 'prefix', 'write')],
-        ['activeCount', requireU32View(bindings?.activeCount, 1, 'activeCount', 'read')],
-        ['outputIndices', requireU32View(bindings?.outputIndices, outputCapacity, 'outputIndices', 'write')],
-        ['outputCount', requireU32View(bindings?.outputCount, 1, 'outputCount', 'write')],
-        ['status', requireU32View(bindings?.status, 1, 'status', 'write')],
-      ];
-      for (let left = 0; left < views.length; left += 1) {
-        for (let right = left + 1; right < views.length; right += 1) {
-          rejectSameViewAlias(views[left][1], views[left][0], views[right][1], views[right][0]);
-        }
-      }
-      return prepared.submit({ bindings: Object.fromEntries(views) });
+      const normalized = {
+        flags: requireU32View(bindings?.flags, inputCapacity, 'flags', 'read'),
+        prefix: requireU32View(bindings?.prefix, inputCapacity, 'prefix', 'write'),
+        activeCount: requireU32View(bindings?.activeCount, 1, 'activeCount', 'read'),
+        outputIndices: requireU32View(bindings?.outputIndices, outputCapacity, 'outputIndices', 'write'),
+        outputCount: requireU32View(bindings?.outputCount, 1, 'outputCount', 'write'),
+        status: requireU32View(bindings?.status, 1, 'status', 'write'),
+      };
+      rejectSameViewWriteConflicts([
+        { label: 'flags', view: normalized.flags, access: 'read' },
+        { label: 'prefix', view: normalized.prefix, access: 'write' },
+        { label: 'activeCount', view: normalized.activeCount, access: 'read' },
+        { label: 'outputIndices', view: normalized.outputIndices, access: 'write' },
+        { label: 'outputCount', view: normalized.outputCount, access: 'write' },
+        { label: 'status', view: normalized.status, access: 'write' },
+      ]);
+      return prepared.submit({ bindings: normalized });
     },
     async close() {
       if (closed) return;
