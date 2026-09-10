@@ -45,6 +45,10 @@ async function writeU32(allocation, values) {
 }
 
 async function readU32(allocation, count = allocation.count) {
+  if (!Number.isSafeInteger(count) || count < 0 || count > allocation.count) {
+    throw new RangeError('fixture read count is outside allocation');
+  }
+  if (count === 0) return [];
   const result = await allocation.memory.read({ byteLength: count * U32_BYTES });
   return decodeU32(result.bytes);
 }
