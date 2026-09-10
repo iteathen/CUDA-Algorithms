@@ -17,20 +17,20 @@ function stableOrderIndicesByKeyU32(keys, indicesIn, indicesOut, activeCount, ke
   const i = gpu.thread.globalX();
   const active = activeCount[gpu.u32(0)];
 
-  if (status[gpu.u32(0)] !== gpu.u32(0)) {
+  if (gpu.atomic.loadRelaxedDevice(status, gpu.u32(0)) !== gpu.u32(0)) {
     return;
   }
 
   if (active > inputCapacity) {
     if (i === gpu.u32(0)) {
-      status[gpu.u32(0)] = gpu.u32(1);
+      gpu.atomic.cas(status, gpu.u32(0), gpu.u32(0), gpu.u32(1));
     }
     return;
   }
 
   if (active > outputCapacity) {
     if (i === gpu.u32(0)) {
-      status[gpu.u32(0)] = gpu.u32(2);
+      gpu.atomic.cas(status, gpu.u32(0), gpu.u32(0), gpu.u32(2));
     }
     return;
   }
@@ -67,6 +67,7 @@ function stableOrderIndicesByKeyU32(keys, indicesIn, indicesOut, activeCount, ke
 
 export const deviceProgramRequest = Object.freeze({
   source,
+  compile: Object.freeze({ headerProfile: 'cuda-cccl' }),
   functions: Object.freeze([
     Object.freeze({
       name: 'resetOrderingStatus',
