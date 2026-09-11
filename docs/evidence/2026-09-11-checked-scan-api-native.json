@@ -1,0 +1,1271 @@
+{
+  "kind": "checked-scan-public-api-native-qualification",
+  "preflight": {
+    "source": "f82997aea9e47d41bd2f0886d11d9ca977df3187",
+    "cudaJs": "98e2ebc942c14d63acf4dd82e912dd548c363a05",
+    "node": "v26.7.0",
+    "gpu": {
+      "name": "NVIDIA GeForce GTX 1660 Ti",
+      "driver": "610.74",
+      "freeMiB": 5066,
+      "totalMiB": 6144
+    },
+    "upperBoundBytes": 282135720,
+    "timeoutMs": 30000,
+    "maxPendingGpuOperations": 2,
+    "startedAt": "2026-09-11T05:50:50.655Z"
+  },
+  "completion": {
+    "failed": false,
+    "elapsedMs": 12927.0261
+  },
+  "rawStdoutSha256": "3b0fc493b412e2bbe4c2b7749e980d5bc96b2f060f70766b5b007aa1037b802e",
+  "rawStderrSha256": "a86cbef099a487567fade43722bc314d75e0a562b0d36ea1db68db05a2c7c81a",
+  "stderr": "(node:8584) ExperimentalWarning: FFI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:8584) ExperimentalWarning: FFI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n[segment-scan] 8192 complete\n[segment-scan] 65536 complete\n[segment-scan] 262144 complete\n",
+  "result": {
+    "outcome": "native-checked-scan-api-pass",
+    "nativeVerified": true,
+    "maintainedCandidateApi": true,
+    "gpuEqualityOrOrdering": false,
+    "payloadCopy": false,
+    "maximumCapacity": 262144,
+    "maximumDeviceBytes": 13700264,
+    "upperBoundBytes": 282135720,
+    "results": [
+      {
+        "name": "extent-0",
+        "count": 0,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 0,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-1",
+        "count": 1,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-63",
+        "count": 63,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 21,
+        "totalLength": 174,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-64",
+        "count": 64,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-65",
+        "count": 65,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-127",
+        "count": 127,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-128",
+        "count": 128,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-129",
+        "count": 129,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-511",
+        "count": 511,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-512",
+        "count": 512,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-513",
+        "count": 513,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-equal",
+        "count": 4,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 19,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-and-zero-length",
+        "count": 4,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 4,
+        "totalLength": 9,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-first-head",
+        "count": 2,
+        "blockSize": 64,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-flag",
+        "count": 2,
+        "blockSize": 64,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-extent",
+        "count": 514,
+        "blockSize": 64,
+        "expectedStatus": 1,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "exact-u32-limit",
+        "count": 2,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 4294967295,
+        "nativeVerified": true
+      },
+      {
+        "name": "u32-overflow",
+        "count": 2,
+        "blockSize": 64,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "cross-tile-overflow",
+        "count": 513,
+        "blockSize": 64,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "valid-reuse-after-errors",
+        "count": 3,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 11,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-0",
+        "count": 0,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 0,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-1",
+        "count": 1,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-63",
+        "count": 63,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 21,
+        "totalLength": 174,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-64",
+        "count": 64,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-65",
+        "count": 65,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-127",
+        "count": 127,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-128",
+        "count": 128,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-129",
+        "count": 129,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-511",
+        "count": 511,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-512",
+        "count": 512,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-513",
+        "count": 513,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-equal",
+        "count": 4,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 19,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-and-zero-length",
+        "count": 4,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 4,
+        "totalLength": 9,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-first-head",
+        "count": 2,
+        "blockSize": 128,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-flag",
+        "count": 2,
+        "blockSize": 128,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-extent",
+        "count": 514,
+        "blockSize": 128,
+        "expectedStatus": 1,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "exact-u32-limit",
+        "count": 2,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 4294967295,
+        "nativeVerified": true
+      },
+      {
+        "name": "u32-overflow",
+        "count": 2,
+        "blockSize": 128,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "cross-tile-overflow",
+        "count": 513,
+        "blockSize": 128,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "valid-reuse-after-errors",
+        "count": 3,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 11,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-0",
+        "count": 0,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 0,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-1",
+        "count": 1,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-63",
+        "count": 63,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 21,
+        "totalLength": 174,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-64",
+        "count": 64,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-65",
+        "count": 65,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-127",
+        "count": 127,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-128",
+        "count": 128,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-129",
+        "count": 129,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-511",
+        "count": 511,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-512",
+        "count": 512,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-513",
+        "count": 513,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-equal",
+        "count": 4,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 19,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-and-zero-length",
+        "count": 4,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 4,
+        "totalLength": 9,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-first-head",
+        "count": 2,
+        "blockSize": 256,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-flag",
+        "count": 2,
+        "blockSize": 256,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-extent",
+        "count": 514,
+        "blockSize": 256,
+        "expectedStatus": 1,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "exact-u32-limit",
+        "count": 2,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 4294967295,
+        "nativeVerified": true
+      },
+      {
+        "name": "u32-overflow",
+        "count": 2,
+        "blockSize": 256,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "cross-tile-overflow",
+        "count": 513,
+        "blockSize": 256,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "valid-reuse-after-errors",
+        "count": 3,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 11,
+        "nativeVerified": true
+      },
+      {
+        "name": "group-capacity",
+        "count": 3,
+        "blockSize": 128,
+        "expectedStatus": 4,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "capacity-recovery",
+        "count": 3,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 5,
+        "nativeVerified": true
+      },
+      {
+        "name": "zero-group-capacity-empty",
+        "count": 0,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 0,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "zero-group-capacity-nonempty",
+        "count": 1,
+        "blockSize": 128,
+        "expectedStatus": 4,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "count": 128,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 48,
+        "totalLength": 10597,
+        "nativeVerified": true
+      },
+      {
+        "name": "nullable-row-groups",
+        "count": 7,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 4,
+        "totalLength": 14,
+        "nativeVerified": true
+      },
+      {
+        "name": "scaling-8192",
+        "count": 8192,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 1171,
+        "totalLength": 17556,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-8192",
+        "count": 8192,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 8192,
+        "totalLength": 122788,
+        "nativeVerified": true
+      },
+      {
+        "name": "scaling-65536",
+        "count": 65536,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 9363,
+        "totalLength": 140430,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-65536",
+        "count": 65536,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 65536,
+        "totalLength": 983011,
+        "nativeVerified": true
+      },
+      {
+        "name": "scaling-262144",
+        "count": 262144,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 37450,
+        "totalLength": 561727,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-262144",
+        "count": 262144,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 262144,
+        "totalLength": 3932068,
+        "nativeVerified": true
+      }
+    ],
+    "samples": [
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "capacity": 128,
+        "blockSize": 128,
+        "pass": 0,
+        "warmup": true,
+        "uploadMs": 0.5546000000003914,
+        "submitWaitMs": 0.6042999999999665,
+        "readbackMs": 1.0747999999994136
+      },
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "capacity": 128,
+        "blockSize": 128,
+        "pass": 1,
+        "warmup": false,
+        "uploadMs": 0.5258999999996377,
+        "submitWaitMs": 0.6302999999998065,
+        "readbackMs": 1.0375000000003638
+      },
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "capacity": 128,
+        "blockSize": 128,
+        "pass": 2,
+        "warmup": false,
+        "uploadMs": 0.9377999999996973,
+        "submitWaitMs": 0.876100000000406,
+        "readbackMs": 1.2646999999997206
+      },
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "capacity": 128,
+        "blockSize": 128,
+        "pass": 3,
+        "warmup": false,
+        "uploadMs": 0.4753000000000611,
+        "submitWaitMs": 0.9672999999993408,
+        "readbackMs": 1.359400000000278
+      },
+      {
+        "name": "scaling-8192",
+        "capacity": 8192,
+        "blockSize": 128,
+        "pass": 0,
+        "warmup": true,
+        "uploadMs": 0.7743000000000393,
+        "submitWaitMs": 0.8218999999999141,
+        "readbackMs": 1.2181000000000495
+      },
+      {
+        "name": "scaling-8192",
+        "capacity": 8192,
+        "blockSize": 128,
+        "pass": 1,
+        "warmup": false,
+        "uploadMs": 0.5758999999998196,
+        "submitWaitMs": 0.7092000000002372,
+        "readbackMs": 1.3446999999996478
+      },
+      {
+        "name": "scaling-8192",
+        "capacity": 8192,
+        "blockSize": 128,
+        "pass": 2,
+        "warmup": false,
+        "uploadMs": 0.5282000000006519,
+        "submitWaitMs": 0.7463999999999942,
+        "readbackMs": 1.9609999999993306
+      },
+      {
+        "name": "scaling-8192",
+        "capacity": 8192,
+        "blockSize": 128,
+        "pass": 3,
+        "warmup": false,
+        "uploadMs": 1.0182999999997264,
+        "submitWaitMs": 0.8478000000004613,
+        "readbackMs": 1.5367999999998574
+      },
+      {
+        "name": "scaling-65536",
+        "capacity": 65536,
+        "blockSize": 128,
+        "pass": 0,
+        "warmup": true,
+        "uploadMs": 1.4053000000003522,
+        "submitWaitMs": 1.23700000000008,
+        "readbackMs": 1.7867999999998574
+      },
+      {
+        "name": "scaling-65536",
+        "capacity": 65536,
+        "blockSize": 128,
+        "pass": 1,
+        "warmup": false,
+        "uploadMs": 1.2393000000001848,
+        "submitWaitMs": 0.9625999999998385,
+        "readbackMs": 1.545100000000275
+      },
+      {
+        "name": "scaling-65536",
+        "capacity": 65536,
+        "blockSize": 128,
+        "pass": 2,
+        "warmup": false,
+        "uploadMs": 1.0641000000005079,
+        "submitWaitMs": 1.0226999999995314,
+        "readbackMs": 1.6376000000000204
+      },
+      {
+        "name": "scaling-65536",
+        "capacity": 65536,
+        "blockSize": 128,
+        "pass": 3,
+        "warmup": false,
+        "uploadMs": 1.57549999999992,
+        "submitWaitMs": 1.5549999999993815,
+        "readbackMs": 1.5546000000003914
+      },
+      {
+        "name": "scaling-262144",
+        "capacity": 262144,
+        "blockSize": 128,
+        "pass": 0,
+        "warmup": true,
+        "uploadMs": 3.8181000000004133,
+        "submitWaitMs": 1.769999999999527,
+        "readbackMs": 3.3989000000001397
+      },
+      {
+        "name": "scaling-262144",
+        "capacity": 262144,
+        "blockSize": 128,
+        "pass": 1,
+        "warmup": false,
+        "uploadMs": 3.7069000000001324,
+        "submitWaitMs": 1.035399999999754,
+        "readbackMs": 2.829099999999926
+      },
+      {
+        "name": "scaling-262144",
+        "capacity": 262144,
+        "blockSize": 128,
+        "pass": 2,
+        "warmup": false,
+        "uploadMs": 3.7181000000000495,
+        "submitWaitMs": 0.9781999999995605,
+        "readbackMs": 2.770300000000134
+      },
+      {
+        "name": "scaling-262144",
+        "capacity": 262144,
+        "blockSize": 128,
+        "pass": 3,
+        "warmup": false,
+        "uploadMs": 3.696999999999207,
+        "submitWaitMs": 1.0960000000004584,
+        "readbackMs": 2.8721999999997934
+      }
+    ],
+    "setups": [
+      {
+        "capacity": 513,
+        "blockSize": 64,
+        "setupMs": 1300.8872,
+        "deviceBytes": 29836,
+        "nodes": 9
+      },
+      {
+        "capacity": 513,
+        "blockSize": 128,
+        "setupMs": 565.3039999999999,
+        "deviceBytes": 32876,
+        "nodes": 9
+      },
+      {
+        "capacity": 513,
+        "blockSize": 256,
+        "setupMs": 555.5432000000001,
+        "deviceBytes": 39004,
+        "nodes": 9
+      },
+      {
+        "capacity": 8,
+        "blockSize": 128,
+        "setupMs": 558.3678999999997,
+        "deviceBytes": 3224,
+        "nodes": 5
+      },
+      {
+        "capacity": 8,
+        "blockSize": 128,
+        "setupMs": 560.3536999999997,
+        "deviceBytes": 3224,
+        "nodes": 5
+      },
+      {
+        "capacity": 128,
+        "blockSize": 128,
+        "setupMs": 565.5536000000002,
+        "deviceBytes": 6696,
+        "nodes": 5
+      },
+      {
+        "capacity": 8192,
+        "blockSize": 128,
+        "setupMs": 558.8356999999996,
+        "deviceBytes": 429608,
+        "nodes": 9
+      },
+      {
+        "capacity": 65536,
+        "blockSize": 128,
+        "setupMs": 558.3198000000002,
+        "deviceBytes": 3427400,
+        "nodes": 13
+      },
+      {
+        "capacity": 262144,
+        "blockSize": 128,
+        "setupMs": 564.5172999999995,
+        "deviceBytes": 13700264,
+        "nodes": 13
+      }
+    ],
+    "scanControls": {
+      "controls": [
+        {
+          "name": "scan-extent-0",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-1",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-63",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-64",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-65",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-127",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-128",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-129",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-511",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-512",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-513",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-max-u32",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-overflow",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-cross-tile-overflow",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-invalid-extent",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-upstream-failure-precedes-invalid-extent",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-recovery",
+          "blockSize": 64,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-0",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-1",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-63",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-64",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-65",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-127",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-128",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-129",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-511",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-512",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-513",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-max-u32",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-overflow",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-cross-tile-overflow",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-invalid-extent",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-upstream-failure-precedes-invalid-extent",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-recovery",
+          "blockSize": 128,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-0",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-1",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-63",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-64",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-65",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-127",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-128",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-129",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-511",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-512",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-extent-513",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-max-u32",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-overflow",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-cross-tile-overflow",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-invalid-extent",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-upstream-failure-precedes-invalid-extent",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "scan-recovery",
+          "blockSize": 256,
+          "nativeVerified": true
+        },
+        {
+          "name": "standalone-full-prefix-8192",
+          "nativeVerified": true
+        },
+        {
+          "name": "standalone-full-prefix-65536",
+          "nativeVerified": true
+        },
+        {
+          "name": "standalone-full-prefix-262144",
+          "nativeVerified": true
+        },
+        {
+          "name": "device-chained-count",
+          "nativeVerified": true
+        },
+        {
+          "name": "device-chained-upstream-failure",
+          "nativeVerified": true
+        },
+        {
+          "name": "device-chained-count",
+          "nativeVerified": true
+        },
+        {
+          "name": "segment-upstream-failure",
+          "nativeVerified": true
+        },
+        {
+          "name": "segment-upstream-recovery",
+          "nativeVerified": true
+        }
+      ],
+      "benchmark": [
+        {
+          "name": "legacy",
+          "n": 8192,
+          "pass": 0,
+          "warmup": true,
+          "submitWaitMs": 10.47400000000016,
+          "nativeVerified": true
+        },
+        {
+          "name": "modern",
+          "n": 8192,
+          "pass": 0,
+          "warmup": true,
+          "submitWaitMs": 1.7067999999999302,
+          "nativeVerified": true
+        },
+        {
+          "name": "modern",
+          "n": 8192,
+          "pass": 1,
+          "warmup": false,
+          "submitWaitMs": 11.550100000000384,
+          "nativeVerified": true
+        },
+        {
+          "name": "legacy",
+          "n": 8192,
+          "pass": 1,
+          "warmup": false,
+          "submitWaitMs": 2.6666999999997643,
+          "nativeVerified": true
+        },
+        {
+          "name": "legacy",
+          "n": 8192,
+          "pass": 2,
+          "warmup": false,
+          "submitWaitMs": 15.461599999998725,
+          "nativeVerified": true
+        },
+        {
+          "name": "modern",
+          "n": 8192,
+          "pass": 2,
+          "warmup": false,
+          "submitWaitMs": 15.534099999998944,
+          "nativeVerified": true
+        },
+        {
+          "name": "modern",
+          "n": 8192,
+          "pass": 3,
+          "warmup": false,
+          "submitWaitMs": 13.654599999999846,
+          "nativeVerified": true
+        },
+        {
+          "name": "legacy",
+          "n": 8192,
+          "pass": 3,
+          "warmup": false,
+          "submitWaitMs": 13.835100000000239,
+          "nativeVerified": true
+        }
+      ],
+      "interpretation": "Legacy performs stable selection only; modern additionally computes group IDs, compact lengths and checked offsets. Submit/wait includes orchestration; inputs stay resident."
+    },
+    "cleanup": "graceful"
+  }
+}

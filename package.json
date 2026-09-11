@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "test:reference": "node --test reference/core-primitives.test.mjs reference/permutation-ordering.test.mjs reference/grouping-boundary.test.mjs reference/ranked-index-closure.test.mjs reference/ranked-derived-activation.test.mjs",
-    "test:candidate": "node --test test/candidate-api.test.mjs test/ranked-derived-activation.test.mjs",
+    "test:candidate": "node --test test/candidate-api.test.mjs test/ranked-derived-activation.test.mjs test/checked-scan.test.mjs",
     "verify:documents": "node tools/verify-documents.mjs"
   }
 }

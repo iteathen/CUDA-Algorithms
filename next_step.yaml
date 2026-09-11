@@ -1,5 +1,30 @@
 {
   "schema_version": 4,
+  "issue_9_implementation": {
+    "branch": "codex/checked-scan-issue-9",
+    "contract": "docs/specs/SPEC-0005-checked-scan-and-segment-offsets.md",
+    "status": "public_candidate_api_native_qualified_ready_for_review",
+    "native_source": "f82997aea9e47d41bd2f0886d11d9ca977df3187",
+    "native_evidence": "docs/evidence/2026-09-11-checked-scan-api-native.json",
+    "native_qualification": "72 segment fixtures, 59 scan/chaining controls, 8 selection comparisons",
+    "local_tests": 49,
+    "ci": "34567500406_pass",
+    "harness": "experiments/native-qualification/run-checked-scan.mjs",
+    "dependency": "98e2ebc942c14d63acf4dd82e912dd548c363a05",
+    "next": "review and integrate Candidate APIs, then deliberate consumer pin adoption"
+  },
+  "segment_scan_experiment": {
+    "branch": "codex/oqs-segment-scan",
+    "base": "48ee0aec9acae7776950f03ab52ab1737e598b6e",
+    "record": "experiments/segment-scan/README.md",
+    "status": "portable_and_72_native_fixture_checks_pass",
+    "native_source": "7d923eb5e4bf4664feab0d0d7c3dded2f81e15b3",
+    "native_evidence": "docs/evidence/2026-09-11-segment-scan-native.json",
+    "producer_gap": "https://github.com/iteathen/CUDA-Algorithms/issues/9",
+    "portable_ci": "34565710334_pass_at_7d923eb",
+    "public_api": false,
+    "next": "specify and qualify checked scan/select public composition before consumer pin adoption"
+  },
   "updated": "2026-09-09",
   "status": "ranked_derived_activation_portable_qualified_native_next",
   "objective": "Qualify and evolve reusable provider-neutral GPU ranked/workset algorithms while keeping Node administrative and all CUDA/native mechanisms in CUDA-JS.",

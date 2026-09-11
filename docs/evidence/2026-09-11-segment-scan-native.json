@@ -1,0 +1,908 @@
+{
+  "kind": "bounded-segment-scan-native-experiment",
+  "preflight": {
+    "source": "7d923eb5e4bf4664feab0d0d7c3dded2f81e15b3",
+    "cudaJs": "98e2ebc942c14d63acf4dd82e912dd548c363a05",
+    "node": "v26.7.0",
+    "gpu": {
+      "name": "NVIDIA GeForce GTX 1660 Ti",
+      "driver": "610.74",
+      "freeMiB": 5059,
+      "totalMiB": 6144
+    },
+    "upperBoundBytes": 280038556,
+    "timeoutMs": 30000,
+    "startedAt": "2026-09-11T05:20:44.418Z"
+  },
+  "rawStdoutSha256": "e59f2664cd031e925ee43a9f5be6d2eefa99c58453b4fe50f1d7a9942d669e23",
+  "rawStderrSha256": "cfd0eb9fae4f8dfe228aee2290fc3b0c6390052f4dbe7d3d686b58a6619c1174",
+  "stderr": "(node:24492) ExperimentalWarning: FFI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:24492) ExperimentalWarning: FFI is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n[segment-scan] 8192 complete\n[segment-scan] 65536 complete\n[segment-scan] 262144 complete\n",
+  "result": {
+    "outcome": "native-segment-scan-pass",
+    "nativeVerified": true,
+    "productionApi": false,
+    "gpuEqualityOrOrdering": false,
+    "payloadCopy": false,
+    "maximumCapacity": 262144,
+    "maximumDeviceBytes": 11603100,
+    "upperBoundBytes": 280038556,
+    "results": [
+      {
+        "name": "extent-0",
+        "count": 0,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 0,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-1",
+        "count": 1,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-63",
+        "count": 63,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 21,
+        "totalLength": 174,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-64",
+        "count": 64,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-65",
+        "count": 65,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-127",
+        "count": 127,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-128",
+        "count": 128,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-129",
+        "count": 129,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-511",
+        "count": 511,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-512",
+        "count": 512,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-513",
+        "count": 513,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-equal",
+        "count": 4,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 19,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-and-zero-length",
+        "count": 4,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 4,
+        "totalLength": 9,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-first-head",
+        "count": 2,
+        "blockSize": 64,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-flag",
+        "count": 2,
+        "blockSize": 64,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-extent",
+        "count": 514,
+        "blockSize": 64,
+        "expectedStatus": 1,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "exact-u32-limit",
+        "count": 2,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 4294967295,
+        "nativeVerified": true
+      },
+      {
+        "name": "u32-overflow",
+        "count": 2,
+        "blockSize": 64,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "cross-tile-overflow",
+        "count": 513,
+        "blockSize": 64,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "valid-reuse-after-errors",
+        "count": 3,
+        "blockSize": 64,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 11,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-0",
+        "count": 0,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 0,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-1",
+        "count": 1,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-63",
+        "count": 63,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 21,
+        "totalLength": 174,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-64",
+        "count": 64,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-65",
+        "count": 65,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-127",
+        "count": 127,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-128",
+        "count": 128,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-129",
+        "count": 129,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-511",
+        "count": 511,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-512",
+        "count": 512,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-513",
+        "count": 513,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-equal",
+        "count": 4,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 19,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-and-zero-length",
+        "count": 4,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 4,
+        "totalLength": 9,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-first-head",
+        "count": 2,
+        "blockSize": 128,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-flag",
+        "count": 2,
+        "blockSize": 128,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-extent",
+        "count": 514,
+        "blockSize": 128,
+        "expectedStatus": 1,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "exact-u32-limit",
+        "count": 2,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 4294967295,
+        "nativeVerified": true
+      },
+      {
+        "name": "u32-overflow",
+        "count": 2,
+        "blockSize": 128,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "cross-tile-overflow",
+        "count": 513,
+        "blockSize": 128,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "valid-reuse-after-errors",
+        "count": 3,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 11,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-0",
+        "count": 0,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 0,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-1",
+        "count": 1,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-63",
+        "count": 63,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 21,
+        "totalLength": 174,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-64",
+        "count": 64,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-65",
+        "count": 65,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 22,
+        "totalLength": 180,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-127",
+        "count": 127,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-128",
+        "count": 128,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-129",
+        "count": 129,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 43,
+        "totalLength": 372,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-511",
+        "count": 511,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-512",
+        "count": 512,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "extent-513",
+        "count": 513,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 171,
+        "totalLength": 1539,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-equal",
+        "count": 4,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 19,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-and-zero-length",
+        "count": 4,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 4,
+        "totalLength": 9,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-first-head",
+        "count": 2,
+        "blockSize": 256,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-flag",
+        "count": 2,
+        "blockSize": 256,
+        "expectedStatus": 2,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "invalid-extent",
+        "count": 514,
+        "blockSize": 256,
+        "expectedStatus": 1,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "exact-u32-limit",
+        "count": 2,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 4294967295,
+        "nativeVerified": true
+      },
+      {
+        "name": "u32-overflow",
+        "count": 2,
+        "blockSize": 256,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "cross-tile-overflow",
+        "count": 513,
+        "blockSize": 256,
+        "expectedStatus": 3,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "valid-reuse-after-errors",
+        "count": 3,
+        "blockSize": 256,
+        "expectedStatus": 0,
+        "groups": 2,
+        "totalLength": 11,
+        "nativeVerified": true
+      },
+      {
+        "name": "group-capacity",
+        "count": 3,
+        "blockSize": 128,
+        "expectedStatus": 4,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "capacity-recovery",
+        "count": 3,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 1,
+        "totalLength": 5,
+        "nativeVerified": true
+      },
+      {
+        "name": "zero-group-capacity-empty",
+        "count": 0,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 0,
+        "totalLength": 0,
+        "nativeVerified": true
+      },
+      {
+        "name": "zero-group-capacity-nonempty",
+        "count": 1,
+        "blockSize": 128,
+        "expectedStatus": 4,
+        "groups": null,
+        "totalLength": null,
+        "nativeVerified": true
+      },
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "count": 128,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 48,
+        "totalLength": 10597,
+        "nativeVerified": true
+      },
+      {
+        "name": "nullable-row-groups",
+        "count": 7,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 4,
+        "totalLength": 14,
+        "nativeVerified": true
+      },
+      {
+        "name": "scaling-8192",
+        "count": 8192,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 1171,
+        "totalLength": 17556,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-8192",
+        "count": 8192,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 8192,
+        "totalLength": 122788,
+        "nativeVerified": true
+      },
+      {
+        "name": "scaling-65536",
+        "count": 65536,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 9363,
+        "totalLength": 140430,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-65536",
+        "count": 65536,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 65536,
+        "totalLength": 983011,
+        "nativeVerified": true
+      },
+      {
+        "name": "scaling-262144",
+        "count": 262144,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 37450,
+        "totalLength": 561727,
+        "nativeVerified": true
+      },
+      {
+        "name": "all-distinct-262144",
+        "count": 262144,
+        "blockSize": 128,
+        "expectedStatus": 0,
+        "groups": 262144,
+        "totalLength": 3932068,
+        "nativeVerified": true
+      }
+    ],
+    "samples": [
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "capacity": 128,
+        "blockSize": 128,
+        "pass": 0,
+        "warmup": true,
+        "uploadMs": 0.4610000000002401,
+        "submitWaitMs": 0.6629000000002634,
+        "readbackMs": 1.3537999999998647
+      },
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "capacity": 128,
+        "blockSize": 128,
+        "pass": 1,
+        "warmup": false,
+        "uploadMs": 0.7767000000003463,
+        "submitWaitMs": 0.7736999999997352,
+        "readbackMs": 1.1885000000002037
+      },
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "capacity": 128,
+        "blockSize": 128,
+        "pass": 2,
+        "warmup": false,
+        "uploadMs": 0.3811999999998079,
+        "submitWaitMs": 0.490099999999984,
+        "readbackMs": 1.1013000000002648
+      },
+      {
+        "name": "oqs-cut-five-residual-payloads",
+        "capacity": 128,
+        "blockSize": 128,
+        "pass": 3,
+        "warmup": false,
+        "uploadMs": 0.4025000000001455,
+        "submitWaitMs": 0.4683999999997468,
+        "readbackMs": 1.2186000000001513
+      },
+      {
+        "name": "scaling-8192",
+        "capacity": 8192,
+        "blockSize": 128,
+        "pass": 0,
+        "warmup": true,
+        "uploadMs": 0.5342999999993481,
+        "submitWaitMs": 0.6413000000002285,
+        "readbackMs": 1.3738000000003012
+      },
+      {
+        "name": "scaling-8192",
+        "capacity": 8192,
+        "blockSize": 128,
+        "pass": 1,
+        "warmup": false,
+        "uploadMs": 0.36490000000048894,
+        "submitWaitMs": 0.5788999999995212,
+        "readbackMs": 1.1300000000001091
+      },
+      {
+        "name": "scaling-8192",
+        "capacity": 8192,
+        "blockSize": 128,
+        "pass": 2,
+        "warmup": false,
+        "uploadMs": 0.3746000000001004,
+        "submitWaitMs": 0.6873999999997977,
+        "readbackMs": 1.0901000000003478
+      },
+      {
+        "name": "scaling-8192",
+        "capacity": 8192,
+        "blockSize": 128,
+        "pass": 3,
+        "warmup": false,
+        "uploadMs": 0.4510999999993146,
+        "submitWaitMs": 0.6262000000006083,
+        "readbackMs": 1.0830999999998312
+      },
+      {
+        "name": "scaling-65536",
+        "capacity": 65536,
+        "blockSize": 128,
+        "pass": 0,
+        "warmup": true,
+        "uploadMs": 1.063999999999396,
+        "submitWaitMs": 0.7959000000000742,
+        "readbackMs": 1.6601000000000568
+      },
+      {
+        "name": "scaling-65536",
+        "capacity": 65536,
+        "blockSize": 128,
+        "pass": 1,
+        "warmup": false,
+        "uploadMs": 0.7646999999997206,
+        "submitWaitMs": 0.9651000000003478,
+        "readbackMs": 3.274699999999939
+      },
+      {
+        "name": "scaling-65536",
+        "capacity": 65536,
+        "blockSize": 128,
+        "pass": 2,
+        "warmup": false,
+        "uploadMs": 0.8413999999993393,
+        "submitWaitMs": 0.884700000000521,
+        "readbackMs": 1.391299999999319
+      },
+      {
+        "name": "scaling-65536",
+        "capacity": 65536,
+        "blockSize": 128,
+        "pass": 3,
+        "warmup": false,
+        "uploadMs": 0.6297999999997046,
+        "submitWaitMs": 0.781699999999546,
+        "readbackMs": 1.4535000000005311
+      },
+      {
+        "name": "scaling-262144",
+        "capacity": 262144,
+        "blockSize": 128,
+        "pass": 0,
+        "warmup": true,
+        "uploadMs": 3.4346000000005006,
+        "submitWaitMs": 1.715400000000045,
+        "readbackMs": 3.034599999999955
+      },
+      {
+        "name": "scaling-262144",
+        "capacity": 262144,
+        "blockSize": 128,
+        "pass": 1,
+        "warmup": false,
+        "uploadMs": 2.3140000000003056,
+        "submitWaitMs": 1.263199999999415,
+        "readbackMs": 4.678200000000288
+      },
+      {
+        "name": "scaling-262144",
+        "capacity": 262144,
+        "blockSize": 128,
+        "pass": 2,
+        "warmup": false,
+        "uploadMs": 2.8350000000000364,
+        "submitWaitMs": 0.9921000000003914,
+        "readbackMs": 3.4668000000001484
+      },
+      {
+        "name": "scaling-262144",
+        "capacity": 262144,
+        "blockSize": 128,
+        "pass": 3,
+        "warmup": false,
+        "uploadMs": 2.4124000000001615,
+        "submitWaitMs": 0.8618999999998778,
+        "readbackMs": 2.6966999999995096
+      }
+    ],
+    "setups": [
+      {
+        "capacity": 513,
+        "blockSize": 64,
+        "setupMs": 1377.3669,
+        "deviceBytes": 25720,
+        "nodes": 9
+      },
+      {
+        "capacity": 513,
+        "blockSize": 128,
+        "setupMs": 552.9387000000002,
+        "deviceBytes": 28760,
+        "nodes": 9
+      },
+      {
+        "capacity": 513,
+        "blockSize": 256,
+        "setupMs": 554.0156000000002,
+        "deviceBytes": 34888,
+        "nodes": 9
+      },
+      {
+        "capacity": 8,
+        "blockSize": 128,
+        "setupMs": 560.3602000000001,
+        "deviceBytes": 3260,
+        "nodes": 5
+      },
+      {
+        "capacity": 8,
+        "blockSize": 128,
+        "setupMs": 551.9922999999999,
+        "deviceBytes": 3260,
+        "nodes": 5
+      },
+      {
+        "capacity": 128,
+        "blockSize": 128,
+        "setupMs": 552.2259000000004,
+        "deviceBytes": 5660,
+        "nodes": 5
+      },
+      {
+        "capacity": 8192,
+        "blockSize": 128,
+        "setupMs": 555.8728000000001,
+        "deviceBytes": 364060,
+        "nodes": 9
+      },
+      {
+        "capacity": 65536,
+        "blockSize": 128,
+        "setupMs": 561.1320000000005,
+        "deviceBytes": 2903100,
+        "nodes": 13
+      },
+      {
+        "capacity": 262144,
+        "blockSize": 128,
+        "setupMs": 554.1445999999996,
+        "deviceBytes": 11603100,
+        "nodes": 13
+      }
+    ],
+    "cleanup": "graceful"
+  }
+}

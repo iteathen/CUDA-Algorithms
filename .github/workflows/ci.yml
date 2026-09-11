@@ -58,3 +58,12 @@ jobs:
         run: |
           node --check experiments/native-qualification/run.mjs
           node --check experiments/native-qualification/run-ranked-derived-activation.mjs
+          node --check experiments/native-qualification/run-checked-scan.mjs
+
+      - name: Qualify bounded segment-scan reference and portable composition
+        run: |
+          node --test experiments/segment-scan/reference.test.mjs
+          node experiments/segment-scan/run.mjs portable
+
+      - name: Qualify maintained checked scan and device count/status chaining
+        run: node experiments/native-qualification/run-checked-scan.mjs portable

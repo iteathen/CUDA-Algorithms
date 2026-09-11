@@ -18,6 +18,8 @@ Working Draft -> Candidate -> Accepted
 
 ## Candidate activation contracts
 
+- [SPEC-0005 — Checked u32 scan and segment offsets](SPEC-0005-checked-scan-and-segment-offsets.md): **Candidate** under explicit owner implementation request #9; checked addition, head-flag segmentation, owned finite workspace and device status/count composition.
+
 - [SPEC-0002 — Algorithm Plans, Active Extents, and Device Chaining](SPEC-0002-algorithm-plans-active-extents-and-device-chaining.md): **Candidate** common nonblocking plan, device-resident active-count, semantic-status, resource and alias-ownership contract.
 - [SPEC-0003 — Stable Index Selection and Permutation Ordering](SPEC-0003-core-sequence-and-keyed-primitives.md): **Candidate** first maintained `u32` family: stable select-indices plus stable lexicographic ordering of an index sequence by external key-word columns.
 
