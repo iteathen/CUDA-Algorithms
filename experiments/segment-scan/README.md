@@ -40,3 +40,48 @@ overflow/capacity/failure-reuse and multiple block sizes; measure a short scalin
 ladder; review and record the producer capability disposition. Rollback means
 discard this isolated experiment, never modify the original dependency worktree.
 Full OQS grouping and production scan API acceptance remain separate gates.
+
+## Native outcome
+
+Exact native source: `7d923eb5e4bf4664feab0d0d7c3dded2f81e15b3`.
+[Raw result and preflight](../../docs/evidence/2026-09-11-segment-scan-native.json)
+retain the exact source/lower/Node/GPU/driver identity and raw-log hashes.
+All 72 fixtures / 84 submissions passed inside the original 30-second child
+limit, including all three block sizes, inactive tails, checked overflow,
+capacity errors and valid reuse. The OQS fixture produces 48 groups and offsets
+for 10,597 records. The nullable-row fixture is a separate consumer shape.
+Both supply CPU-prepared boundary flags; device equality is not tested.
+
+| Input entries | Prepared nodes | Device bytes | Measured median submit/wait (ms) |
+| ---: | ---: | ---: | ---: |
+| 128 | 5 | 5,660 | 0.4901 |
+| 8,192 | 9 | 364,060 | 0.6262 |
+| 65,536 | 13 | 2,903,100 | 0.8847 |
+| 262,144 | 13 | 11,603,100 | 0.9921 |
+
+Each timing uses one warmup and three measured repetitions. All samples and
+separate upload/readback/setup times are retained. Overhead dominates these short
+submissions; do not infer linear extrapolation, pure kernel throughput or an
+end-to-end solver speedup. No old-quadratic-path comparison was run.
+
+All 44 local reference/Candidate/experiment tests and document validation pass.
+[Portable/reference CI 34565710334](https://github.com/iteathen/CUDA-Algorithms/actions/runs/34565710334)
+also passes at the exact native source revision.
+Author-side bounded review checked ping-pong read/write separation, uniform
+barrier reach, hierarchy tail initialization, u32 product/range limits,
+failure-before-result publication and reverse resource disposal. This is not
+independent acceptance of a public API.
+
+The supported-library gap is filed as
+[CUDA-Algorithms #9](https://github.com/iteathen/CUDA-Algorithms/issues/9), beneath
+the existing #3 activation issue. No CUDA-JS mechanism gap was demonstrated.
+Next: specify and qualify the checked scan/select public composition, preserving
+the distinction from modular sums and keeping semantic equality with consumers.
+Then qualify a deliberately pinned Connect4 composition. Scalable ordering and
+payload copying remain separate unfinished work.
+
+Retain this isolated research worktree/branch, its ignored CUDA-JS junction and
+native/portable spools. The original dependency worktree, public source/exports,
+accepted specifications and Connect4 dependency pins are unchanged. No native
+process or device allocation is intentionally retained. No protected-main merge
+or package/API promotion was performed.

@@ -4,9 +4,13 @@
     "branch": "codex/oqs-segment-scan",
     "base": "48ee0aec9acae7776950f03ab52ab1737e598b6e",
     "record": "experiments/segment-scan/README.md",
-    "status": "portable_pass_native_next",
+    "status": "portable_and_72_native_fixture_checks_pass",
+    "native_source": "7d923eb5e4bf4664feab0d0d7c3dded2f81e15b3",
+    "native_evidence": "docs/evidence/2026-09-11-segment-scan-native.json",
+    "producer_gap": "https://github.com/iteathen/CUDA-Algorithms/issues/9",
+    "portable_ci": "34565710334_pass_at_7d923eb",
     "public_api": false,
-    "next": "native bounded controls and scaling; file precise producer gap and acceptance criteria"
+    "next": "specify and qualify checked scan/select public composition before consumer pin adoption"
   },
   "updated": "2026-09-09",
   "status": "ranked_derived_activation_portable_qualified_native_next",

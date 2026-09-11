@@ -5,7 +5,12 @@
 `codex/oqs-segment-scan` adds an experiment under `experiments/segment-scan/`,
 from exact dependency 48ee0ae. It tests parallel prefix computation, dense IDs,
 representative lengths and offsets against OQS and nullable-row fixtures.
-Portable composition and reference tests pass; native qualification is next.
+Portable composition, 44 local tests and 72 native fixture checks pass. Native
+source 7d923eb5, recorded in `docs/evidence/2026-09-11-segment-scan-native.json`,
+handles 262,144 entries with 11,603,100 device bytes and 0.9921 ms median
+submit/wait (three measured repetitions). This is bounded experimental evidence.
+The supported-library gap and acceptance work are filed in
+[issue #9](https://github.com/iteathen/CUDA-Algorithms/issues/9).
 No public export or Candidate specification changed. The inherited ranked
 activation checkpoint below remains separate; Connect4's dependency is unchanged.
 
