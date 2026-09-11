@@ -41,6 +41,25 @@ export async function qualifyScanControls(runtime, numerical) {
     } finally { await plan.close(); if (b) await b.close(); }
   }
 
+  for (const n of [8192, 65536, 262144]) {
+    const options = { inputCapacity: n }; const plan = await createCheckedExclusiveScanU32Plan(runtime, options); let b;
+    try {
+      b = await allocateBindings(runtime, checkedScanU32Requirements(options));
+      const values = Uint32Array.from({ length: n }, (_, i) => i % 17);
+      await b.write('input', values); await b.write('activeCount', [n]); await b.write('upstreamStatus', [0]);
+      const op = await plan.submit(b.bindings);
+      try {
+        assert.equal((await op.wait()).status, 'completed');
+        if (numerical) {
+          let total = 0n; const expected = Array.from(values, v => { const p = Number(total); total += BigInt(v); return p; });
+          assert.equal((await b.read('status'))[0], 0); assert.equal((await b.read('outputCount'))[0], n);
+          assert.equal((await b.read('total'))[0], Number(total)); assert.deepEqual(Array.from(await b.read('prefix', n)), expected);
+        }
+        controls.push({ name: `standalone-full-prefix-${n}`, nativeVerified: numerical });
+      } finally { await op.close(); }
+    } finally { await plan.close(); if (b) await b.close(); }
+  }
+
   // Two plans, one explicit operation edge, zero intermediate reads/waits.
   const options = { inputCapacity: 8 };
   const first = await createCheckedExclusiveScanU32Plan(runtime, options);
