@@ -3,10 +3,15 @@
   "issue_9_implementation": {
     "branch": "codex/checked-scan-issue-9",
     "contract": "docs/specs/SPEC-0005-checked-scan-and-segment-offsets.md",
-    "status": "public_api_portable_pass_native_next",
+    "status": "public_candidate_api_native_qualified_ready_for_review",
+    "native_source": "f82997aea9e47d41bd2f0886d11d9ca977df3187",
+    "native_evidence": "docs/evidence/2026-09-11-checked-scan-api-native.json",
+    "native_qualification": "72 segment fixtures, 59 scan/chaining controls, 8 selection comparisons",
+    "local_tests": 49,
+    "ci": "34567500406_pass",
     "harness": "experiments/native-qualification/run-checked-scan.mjs",
     "dependency": "98e2ebc942c14d63acf4dd82e912dd548c363a05",
-    "next": "native API/consumer/chaining/legacy comparison then evidence and PR"
+    "next": "review and integrate Candidate APIs, then deliberate consumer pin adoption"
   },
   "segment_scan_experiment": {
     "branch": "codex/oqs-segment-scan",

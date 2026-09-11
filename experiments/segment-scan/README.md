@@ -1,5 +1,9 @@
 # Bounded segment scan reconnaissance
 
+Historical prototype, retained for provenance. The maintained implementation is
+now Candidate [SPEC-0005](../../docs/specs/SPEC-0005-checked-scan-and-segment-offsets.md)
+with public APIs under `src/sequence/`; new consumer work should use those APIs.
+
 Producer-owned disposable experiment from CUDA-Algorithms
 48ee0aec9acae7776950f03ab52ab1737e598b6e, motivated by Connect4 O3 at
 5dfe1312a357c48eee53168e82fd6eba27814a06 and issue #3. This is not a new public

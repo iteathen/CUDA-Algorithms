@@ -100,3 +100,21 @@ in-flight/closed lifecycle and injected partial-construction/cleanup failures.
 Benchmark stable representatives against existing quadratic selection on safe
 bounded head flags; measure the same emitted indices, reporting differing extra
 work explicitly. Portable evidence is not numerical/native evidence.
+
+## Qualified implementation
+
+Native source `f82997aea9e47d41bd2f0886d11d9ca977df3187`, CUDA-JS
+`98e2ebc942c14d63acf4dd82e912dd548c363a05` / 0.1.0-alpha.20, Node 26.7.0,
+GTX 1660 Ti, driver 610.74. The
+[recorded run](../evidence/2026-09-11-checked-scan-api-native.json) passes all
+72 segment fixtures and 59 scan/chaining controls, including full standalone
+prefix comparison through 262,144 entries and the real OQS-derived 128-payload
+fixture. Eight alternating-order native comparison passes reproduce the older
+selection's exact representative positions; timings do not establish a clear
+median improvement on that bounded workload. Whole-run cleanup is graceful.
+
+49 local reference/API tests and portable CI 34567500406 pass. Alias/access,
+cross-runtime/stale capability and injected lifecycle failures use public runtime
+testing with test-local method mocks; those checks are not native fault injection.
+Candidate compatibility status is unchanged. No sorting, equality discovery,
+payload-copy, full OQS or other-GPU support claim follows from this evidence.

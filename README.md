@@ -37,8 +37,10 @@ Bindings and external buffer sizes/accesses are listed in `requirements.bindings
 additional. `upstreamStatus` is required (zero for the first stage). Checked sums
 reject overflow; they do not change existing wrapping reference semantics.
 Segment plans consume caller-owned exact group boundaries and lengths; they do
-not sort, decide equality or copy payloads. Native qualification is pending on
-the implementation branch; portable execution is not numerical evidence.
+not sort, decide equality or copy payloads. The maintained API passed native
+qualification on GTX 1660 Ti through CUDA-JS 98e2ebc / Node 26.7.0; see
+[exact evidence](docs/evidence/2026-09-11-checked-scan-api-native.json). Candidate
+status retains a breakable pre-acceptance contract, not a stable release promise.
 
 - [Current status](STATUS.md).
 - [Project charter](docs/PROJECT_CHARTER.md) and [documentation](docs/README.md).

@@ -6,7 +6,14 @@ Branch `codex/checked-scan-issue-9` adds public checked exclusive scan and
 segment-offset plans under Candidate SPEC-0005. Finite workspace is plan-owned;
 inputs/outputs remain caller-owned. Explicit upstream status and CUDA-JS `after`
 support device count/status chaining. Public binding, aliasing, lifetime and
-injected construction/cleanup checks pass. Full native API qualification is next.
+injected construction/cleanup checks pass. Native source f82997ae passes 72
+segment fixtures, 59 scan/chaining controls and eight selection comparison passes
+on GTX 1660 Ti / CUDA-JS 98e2ebc / Node 26.7.0. Both standalone scan and segment
+plans are checked through 262,144 entries. All 49 local tests and CI 34567500406
+pass. Exact evidence: `docs/evidence/2026-09-11-checked-scan-api-native.json`.
+The 8,192-entry comparison has noisy timings and no clear median speed advantage;
+new segment work additionally produces IDs, compact lengths and checked offsets.
+Implementation is ready for review; Candidate status is not promoted to Accepted.
 Existing selection/ordering semantics and lower pins are unchanged.
 
 ## Isolated segment-scan research branch
