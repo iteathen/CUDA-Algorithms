@@ -1,3 +1,7 @@
+export { CHECKED_EXCLUSIVE_SCAN_U32_CONTRACT, checkedScanU32Requirements, createCheckedExclusiveScanU32Plan } from './sequence/checked-exclusive-scan-u32.mjs';
+export { SEGMENT_OFFSETS_U32_CONTRACT, segmentOffsetsU32Requirements, createSegmentOffsetsU32Plan } from './sequence/segment-offsets-u32.mjs';
+export { CHECKED_SCAN_U32_STATUS } from './device/checked-scan-u32-program.mjs';
+
 export {
   STABLE_SELECT_INDICES_U32_CONTRACT,
   createStableSelectIndicesU32Plan,

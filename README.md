@@ -16,6 +16,30 @@ Implementation depends on a concrete consumer need and an accepted specification
 
 ## Start here
 
+Candidate checked integer APIs are available under
+[SPEC-0005](docs/specs/SPEC-0005-checked-scan-and-segment-offsets.md):
+
+```js
+import { checkedScanU32Requirements, createCheckedExclusiveScanU32Plan,
+  segmentOffsetsU32Requirements, createSegmentOffsetsU32Plan } from 'cuda-algorithms';
+
+const options = { inputCapacity: 8192 };
+const requirements = checkedScanU32Requirements(options); // before allocating
+const plan = await createCheckedExclusiveScanU32Plan(runtime, options);
+const operation = await plan.submit(bindings, { after: precedingOperation });
+await operation.wait(); // qualification/administration; no input/result math
+await operation.close();
+await plan.close();
+```
+
+Bindings and external buffer sizes/accesses are listed in `requirements.bindings`.
+`workspaceBytes` is plan-owned device memory; caller buffers/runtime overhead are
+additional. `upstreamStatus` is required (zero for the first stage). Checked sums
+reject overflow; they do not change existing wrapping reference semantics.
+Segment plans consume caller-owned exact group boundaries and lengths; they do
+not sort, decide equality or copy payloads. Native qualification is pending on
+the implementation branch; portable execution is not numerical evidence.
+
 - [Current status](STATUS.md).
 - [Project charter](docs/PROJECT_CHARTER.md) and [documentation](docs/README.md).
 - [Development instructions](AGENTS.md) and [shared contribution guide](https://github.com/iteathen/.github/blob/main/CONTRIBUTING.md).

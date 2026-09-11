@@ -1,5 +1,13 @@
 {
   "schema_version": 4,
+  "issue_9_implementation": {
+    "branch": "codex/checked-scan-issue-9",
+    "contract": "docs/specs/SPEC-0005-checked-scan-and-segment-offsets.md",
+    "status": "public_api_portable_pass_native_next",
+    "harness": "experiments/native-qualification/run-checked-scan.mjs",
+    "dependency": "98e2ebc942c14d63acf4dd82e912dd548c363a05",
+    "next": "native API/consumer/chaining/legacy comparison then evidence and PR"
+  },
   "segment_scan_experiment": {
     "branch": "codex/oqs-segment-scan",
     "base": "48ee0aec9acae7776950f03ab52ab1737e598b6e",

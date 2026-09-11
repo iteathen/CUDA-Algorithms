@@ -1,5 +1,14 @@
 # CUDA-Algorithms Status
 
+## Issue #9 implementation
+
+Branch `codex/checked-scan-issue-9` adds public checked exclusive scan and
+segment-offset plans under Candidate SPEC-0005. Finite workspace is plan-owned;
+inputs/outputs remain caller-owned. Explicit upstream status and CUDA-JS `after`
+support device count/status chaining. Public binding, aliasing, lifetime and
+injected construction/cleanup checks pass. Full native API qualification is next.
+Existing selection/ordering semantics and lower pins are unchanged.
+
 ## Isolated segment-scan research branch
 
 `codex/oqs-segment-scan` adds an experiment under `experiments/segment-scan/`,
