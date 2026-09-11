@@ -1,5 +1,13 @@
 {
   "schema_version": 4,
+  "segment_scan_experiment": {
+    "branch": "codex/oqs-segment-scan",
+    "base": "48ee0aec9acae7776950f03ab52ab1737e598b6e",
+    "record": "experiments/segment-scan/README.md",
+    "status": "portable_pass_native_next",
+    "public_api": false,
+    "next": "native bounded controls and scaling; file precise producer gap and acceptance criteria"
+  },
   "updated": "2026-09-09",
   "status": "ranked_derived_activation_portable_qualified_native_next",
   "objective": "Qualify and evolve reusable provider-neutral GPU ranked/workset algorithms while keeping Node administrative and all CUDA/native mechanisms in CUDA-JS.",

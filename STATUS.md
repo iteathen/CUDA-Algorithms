@@ -1,5 +1,16 @@
 # CUDA-Algorithms Status
 
+## Isolated segment-scan research branch
+
+`codex/oqs-segment-scan` adds an experiment under `experiments/segment-scan/`,
+from exact dependency 48ee0ae. It tests parallel prefix computation, dense IDs,
+representative lengths and offsets against OQS and nullable-row fixtures.
+Portable composition and reference tests pass; native qualification is next.
+No public export or Candidate specification changed. The inherited ranked
+activation checkpoint below remains separate; Connect4's dependency is unchanged.
+
+## Inherited ranked-activation checkpoint
+
 **Updated:** 2026-09-09
 
 **Architecture/ownership:** Accepted under ADR-0001 and SPEC-0001.  
