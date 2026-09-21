@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "repository": "iteathen/CUDA-Algorithms",
+  "visibility": "public",
+  "default_branch": "main",
+  "canonical": "https://github.com/iteathen/CUDA-Algorithms",
+  "anonymous_access": {
+    "git": "https://github.com/iteathen/CUDA-Algorithms.git",
+    "raw_base": "https://raw.githubusercontent.com/iteathen/CUDA-Algorithms/main/",
+    "zip": "https://codeload.github.com/iteathen/CUDA-Algorithms/zip/refs/heads/main",
+    "tar_gz": "https://codeload.github.com/iteathen/CUDA-Algorithms/tar.gz/refs/heads/main"
+  },
+  "entrypoints": {
+    "readme": "README.md",
+    "agents": "AGENTS.md",
+    "llm_index": "llms.txt",
+    "access": ".agent/ACCESS.md"
+  },
+  "authentication_required_for_read": false,
+  "api_required_for_read": false
+}
