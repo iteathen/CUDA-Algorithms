@@ -1,0 +1,20 @@
+# CUDA-Algorithms
+
+> Public source index for LLMs and software agents. Read-only access requires no GitHub authentication.
+
+## Primary entry points
+
+- [README.md](https://raw.githubusercontent.com/iteathen/CUDA-Algorithms/main/README.md): project overview and documentation entry point.
+- [AGENTS.md](https://raw.githubusercontent.com/iteathen/CUDA-Algorithms/main/AGENTS.md): repository-specific agent instructions and authority rules.
+- [Agent access](https://raw.githubusercontent.com/iteathen/CUDA-Algorithms/main/.agent/ACCESS.md): anonymous access routes and precedence notes.
+- [LICENSE](https://raw.githubusercontent.com/iteathen/CUDA-Algorithms/main/LICENSE): license terms.
+
+## Anonymous source access
+
+- Repository: https://github.com/iteathen/CUDA-Algorithms
+- Git clone: `https://github.com/iteathen/CUDA-Algorithms.git`
+- Raw files: https://raw.githubusercontent.com/iteathen/CUDA-Algorithms/main/
+- ZIP snapshot: https://codeload.github.com/iteathen/CUDA-Algorithms/zip/refs/heads/main
+- tar.gz snapshot: https://codeload.github.com/iteathen/CUDA-Algorithms/tar.gz/refs/heads/main
+
+Prefer Git, raw HTTPS, or codeload over the GitHub REST API when possible. Follow repository-local authority and agent instructions.
