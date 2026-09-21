@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "repository": "iteathen/CUDA-Algorithms",
+  "claims": [
+    {
+      "id": "CUDA-ALGORITHMS-PLAN-001",
+      "claim": "Intended project scope is reusable provider-neutral GPU parallel algorithms in the CUDA-JS ecosystem.",
+      "evidence_class": "UNVALIDATED",
+      "status": "planning with internal reference semantics",
+      "oracle": "Repository charter, architecture decisions, and internal reference cases",
+      "revision": "main",
+      "falsifier": "An accepted project decision materially changes the intended scope.",
+      "evidence": [
+        "README.md",
+        "STATUS.md",
+        "docs/PROJECT_CHARTER.md",
+        "reference"
+      ],
+      "limitations": [
+        "Reference/candidate checks are internal qualification aids; no production implementation, native-provider support, or performance is established."
+      ],
+      "external_reproduction": false
+    }
+  ]
+}
